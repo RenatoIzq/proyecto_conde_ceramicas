@@ -15,17 +15,29 @@ class Bienvenida extends StatelessWidget {
           ),
         ),
         child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.all(20),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Center(
-                                        
+          child: Column(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Center(
+                  child: Image.asset(
+                    'images/condeceramicalogo.png',
+                    width: 200,
+                    height: 200,
                   ),
                 ),
-              ],
-            ),
+              ),
+              SizedBox(height: 20),
+              Text(
+                'Bienvenido, seleccione una opción:',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
         ),
       ),
