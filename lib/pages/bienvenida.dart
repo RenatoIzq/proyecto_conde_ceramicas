@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Bienvenida extends StatelessWidget {
   const Bienvenida({super.key});
@@ -17,26 +18,20 @@ class Bienvenida extends StatelessWidget {
         child: SafeArea(
           child: Column(
             children: [
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: Image.asset(
-                    'images/condeceramicalogo.png',
-                    width: 200,
-                    height: 200,
-                  ),
+              Center(
+                child: Image.asset(
+                  'images/condeceramicalogo.png',
+                  width: 200,
+                  height: 200,
                 ),
               ),
               SizedBox(height: 20),
               Text(
                 'Bienvenido, seleccione una opción:',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
                 textAlign: TextAlign.center,
+                style: GoogleFonts.oswald(fontSize: 30, color: Colors.white),
               ),
+              SizedBox(height: 20),
             ],
           ),
         ),
