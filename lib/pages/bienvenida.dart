@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
+import 'package:proyecto_conde_ceramicas/components/menu_button.dart';
 
 class Bienvenida extends StatelessWidget {
   const Bienvenida({super.key});
@@ -40,6 +41,44 @@ class Bienvenida extends StatelessWidget {
                     borderRadius: BorderRadius.only(
                       topLeft: Radius.circular(60),
                       topRight: Radius.circular(60),
+                    ),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(30.0), 
+                    child: GridView.count(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 15,
+                      mainAxisSpacing: 15,
+                      children: [
+                        MenuButton(
+                          title: 'Inventario',
+                          icon: Icons.inventory,
+                          onTap: () {
+                            Navigator.pushNamed(context, 'inventario');
+                          },
+                        ),
+                        MenuButton(
+                          title: 'Reportes',
+                          icon: Icons.report,
+                          onTap: () {
+                            Navigator.pushNamed(context, 'reportes');
+                          },
+                        ),
+                        MenuButton(
+                          title: 'Recetario',
+                          icon: Icons.menu_book_rounded,
+                          onTap: () {
+                            Navigator.pushNamed(context, 'recetario');
+                          },
+                        ),
+                        MenuButton(
+                          title: 'Horandas',
+                          icon: Icons.fireplace,
+                          onTap: () {
+                            Navigator.pushNamed(context, 'hornadas');
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
