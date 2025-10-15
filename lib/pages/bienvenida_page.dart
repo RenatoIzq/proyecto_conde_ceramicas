@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:proyecto_conde_ceramicas/pages/inventario_page.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 import 'package:proyecto_conde_ceramicas/components/menu_button.dart';
 
-class Bienvenida extends StatelessWidget {
-  const Bienvenida({super.key});
+class BienvenidaPage extends StatelessWidget {
+  const BienvenidaPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +45,7 @@ class Bienvenida extends StatelessWidget {
                     ),
                   ),
                   child: Padding(
-                    padding: EdgeInsets.all(30.0), 
+                    padding: EdgeInsets.all(30.0),
                     child: GridView.count(
                       crossAxisCount: 2,
                       crossAxisSpacing: 15,
@@ -54,7 +55,12 @@ class Bienvenida extends StatelessWidget {
                           title: 'Inventario',
                           icon: Icons.inventory,
                           onTap: () {
-                            Navigator.pushNamed(context, 'inventario');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => InventarioPage(),
+                              ),
+                            );
                           },
                         ),
                         MenuButton(

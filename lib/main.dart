@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto_conde_ceramicas/pages/bienvenida.dart';
+import 'package:proyecto_conde_ceramicas/pages/bienvenida_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
         // This is the theme of your application.
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Bienvenida(),
+      home: BienvenidaPage(),
     );
   }
 }
