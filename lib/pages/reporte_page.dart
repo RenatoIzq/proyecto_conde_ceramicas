@@ -46,7 +46,7 @@ class ReportePage extends StatelessWidget {
           },
         ),
         title: Text(
-          'Inventario',
+          'Reporte',
           style: GoogleFonts.oswald(color: Colors.white, fontSize: 30),
         ),
         flexibleSpace: Align(
