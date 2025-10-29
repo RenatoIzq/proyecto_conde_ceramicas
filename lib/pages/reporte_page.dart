@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:proyecto_conde_ceramicas/components/report_section.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 
 class ReportePage extends StatelessWidget {
@@ -7,27 +8,36 @@ class ReportePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     // Datos de ejemplo (reemplazar con datos reales de Firestore/API)
     final List<Map<String, String>> esmaltesData = [
-      {'id': 'E001', 'nombre': 'Azul Cobalto', 'stock': '10 L'},
-      {'id': 'E002', 'nombre': 'Rojo Intenso', 'stock': '5 L'},
-      {'id': 'E003', 'nombre': 'Verde Esmeralda', 'stock': '8 L'},
+      {'id': 'E001', 'nombre': 'Azul Cobalto', 'stock': '500 gr'},
+      {'id': 'E002', 'nombre': 'Rojo Intenso', 'stock': '100 gr'},
+      {'id': 'E003', 'nombre': 'Verde Esmeralda', 'stock': '100 gr'},
+      {'id': 'E001', 'nombre': 'Azul Cobalto', 'stock': '500 gr'},
+      {'id': 'E002', 'nombre': 'Rojo Intenso', 'stock': '100 gr'},
+      {'id': 'E003', 'nombre': 'Verde Esmeralda', 'stock': '100 gr'},
+      {'id': 'E001', 'nombre': 'Azul Cobalto', 'stock': '500 gr'},
+      {'id': 'E002', 'nombre': 'Rojo Intenso', 'stock': '100 gr'},
+      {'id': 'E003', 'nombre': 'Verde Esmeralda', 'stock': '100 gr'},
       // Agrega más filas si es necesario
     ];
 
     final List<Map<String, String>> materiasPrimasData = [
-      {'id': 'MP01', 'nombre': 'Arcilla Blanca', 'stock': '50 Kg'},
-      {'id': 'MP02', 'nombre': 'Caolín', 'stock': '25 Kg'},
-      {'id': 'MP03', 'nombre': 'Feldespato', 'stock': '30 Kg'},
-      {'id': 'MP04', 'nombre': 'Sílice', 'stock': '40 Kg'},
+      {'id': 'MP01', 'nombre': 'Arcilla Blanca', 'stock': '10 Kg'},
+      {'id': 'MP02', 'nombre': 'Caolín', 'stock': '10 Kg'},
+      {'id': 'MP03', 'nombre': 'Feldespato', 'stock': '1 Kg'},
+      {'id': 'MP04', 'nombre': 'Sílice', 'stock': '2 Kg'},
+      {'id': 'MP01', 'nombre': 'Arcilla Blanca', 'stock': '10 Kg'},
+      {'id': 'MP02', 'nombre': 'Caolín', 'stock': '10 Kg'},
+      {'id': 'MP03', 'nombre': 'Feldespato', 'stock': '1 Kg'},
+      {'id': 'MP04', 'nombre': 'Sílice', 'stock': '2 Kg'},
       // Agrega más filas si es necesario
     ];
 
     final List<String> headers = ['ID', 'Nombre', 'Stock'];
 
     return Scaffold(
-        appBar: AppBar(
+      appBar: AppBar(
         backgroundColor: grisoscuro,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
@@ -62,7 +72,17 @@ class ReportePage extends StatelessWidget {
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
-            ReportSec
+            ReportSection(
+              title: 'Esmaltes',
+              headers: headers,
+              data: esmaltesData,
+            ),
+            SizedBox(height: 25),
+            ReportSection(
+              title: 'Materia Primas',
+              headers: headers,
+              data: materiasPrimasData,
+            ),
           ],
         ),
       ),
