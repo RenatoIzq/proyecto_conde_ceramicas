@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 
 class SearchFilterBar extends StatelessWidget {
@@ -40,11 +41,14 @@ class SearchFilterBar extends StatelessWidget {
                 onSearchSubmitted!();
               }
             },
-            style: TextStyle(color: Colors.black, fontSize: 16),
+            style: GoogleFonts.oswald(
+              color: Colors.black,
+              fontSize: 16,
+            ),
             decoration: InputDecoration(
               hintText: searchHintText,
-              hintStyle: TextStyle(color: Colors.grey),
-              prefixIcon: Icon(Icons.search, color: Colors.grey),
+              hintStyle: GoogleFonts.oswald(color: Colors.grey[600]),
+              prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
               filled: true,
               fillColor: Colors.grey[200],
               contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
@@ -63,26 +67,26 @@ class SearchFilterBar extends StatelessWidget {
             ),
           ),
         ),
-        SizedBox(width: 10),
+        SizedBox(width: 2),
         Expanded(
           child: Container(
             padding: EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.grey[200],
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: Colors.grey[400]!),
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
                 value: selectedFilter,
                 isExpanded: true,
-                dropdownColor: Colors.grey,
-                style: TextStyle(color: Colors.black, fontSize: 14),
+                dropdownColor: Colors.grey[200],
+                style: GoogleFonts.oswald(color: Colors.black, fontSize: 16,),
                 iconEnabledColor: Colors.black,
                 items: filterOptions.map((String option) {
                   return DropdownMenuItem<String>(
                     value: option,
-                    child: Text(option, style: TextStyle(color: Colors.black)),
+                    child: Text(option, style: GoogleFonts.oswald(color: Colors.black)),
                   );
                 }).toList(),
                 onChanged: (String? newValue) {
@@ -92,7 +96,7 @@ class SearchFilterBar extends StatelessWidget {
                 },
               ),
             ),
-          )
+          ),
         ),
       ],
     );

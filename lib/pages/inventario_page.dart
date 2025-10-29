@@ -1,7 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:proyecto_conde_ceramicas/components/action_button.dart';
 import 'package:proyecto_conde_ceramicas/components/search_filter_bar.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 
@@ -29,6 +28,22 @@ class _InventarioPageState extends State<InventarioPage> {
   void dispose() {
     searchController.dispose();
     super.dispose();
+  }
+
+  // ---- Funciones de ejemplo para los botones ----
+  void _accionAnadir() {
+    print('Botón Añadir presionado');
+    // Aquí iría la lógica para añadir un nuevo item
+  }
+
+  void _accionEditar() {
+    print('Botón Editar presionado');
+    // Aquí iría la lógica para editar (necesitarías saber qué item está seleccionado)
+  }
+
+  void _accionEliminar() {
+    print('Botón Eliminar presionado');
+    // Aquí iría la lógica para eliminar (necesitarías saber qué item está seleccionado)
   }
 
   @override
@@ -81,7 +96,7 @@ class _InventarioPageState extends State<InventarioPage> {
                   }
                 },
                 searchController: searchController,
-                searchHintText: 'Buscar por nombre o código...',
+                searchHintText: 'Nombre o Código',
                 onSearchChanged: (value) {
                   setState(() {
                     searchTerm = value;
@@ -92,6 +107,40 @@ class _InventarioPageState extends State<InventarioPage> {
                 },
               ),
               const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: ActionButton(
+                      text: 'Añadir',
+                      onPressed: _accionAnadir,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ActionButton(
+                      text: 'Editar',
+                      onPressed: _accionEditar,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ActionButton(
+                      text: 'Eliminar',
+                      onPressed: _accionEliminar,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              //Expanded(
+              //  child: ListView.builder(
+              //    itemCount: 10,
+              //    itemBuilder: (context, index) {
+              //      return Card(child: ListTile(leading: Container()));
+              //    },
+              //  ),
+              //),
             ],
           ),
         ),
