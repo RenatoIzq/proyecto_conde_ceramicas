@@ -30,7 +30,7 @@ class _InventarioPageState extends State<InventarioPage> {
     super.dispose();
   }
 
-  // ---- Funciones de ejemplo para los botones ----
+  // ---- Cambiar ----
   void _accionAnadir() {
     print('Botón Añadir presionado');
     // Aquí iría la lógica para añadir un nuevo item

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:proyecto_conde_ceramicas/pages/hornadas_page.dart';
 import 'package:proyecto_conde_ceramicas/pages/inventario_page.dart';
 import 'package:proyecto_conde_ceramicas/pages/reporte_page.dart';
 import 'package:proyecto_conde_ceramicas/pages/recetario_page.dart';
@@ -93,7 +94,12 @@ class BienvenidaPage extends StatelessWidget {
                           title: 'Horandas',
                           icon: Icons.fireplace,
                           onTap: () {
-                            Navigator.pushNamed(context, 'hornadas');
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HornadasPage(),
+                              ),
+                            );
                           },
                         ),
                       ],
