@@ -1,96 +1,147 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:proyecto_conde_ceramicas/model/hornadas_model.dart';
 import 'package:table_calendar/table_calendar.dart';
+import 'package:proyecto_conde_ceramicas/model/hornadas_model.dart';
 
-class HornadasCalendar extends StatelessWidget {
+class CalendarioHornada extends StatelessWidget {
   final DateTime focusedDay;
   final DateTime? selectedDay;
-  final CalendarFormat calendarFormat;
-  final Map<DateTime, List<Hornada>> events; // Usa el modelo Hornada
-  final Function(DateTime selectedDay, DateTime focusedDay) onDaySelected;
-  final Function(DateTime focusedDay) onPageChanged;
+  final Map<DateTime, List<Hornada>> hornadas;
+  final Function(DateTime, DateTime) onDaySelected;
 
-  const HornadasCalendar({
-    super.key,
+  const CalendarioHornada({
+    Key? key,
     required this.focusedDay,
     required this.selectedDay,
-    required this.calendarFormat,
-    required this.events,
+    required this.hornadas,
     required this.onDaySelected,
-    required this.onPageChanged,
-  });
+  }) : super(key: key);
 
-  List<Hornada> _getEventsForDay(DateTime day) {
-    final dayUtc = DateTime.utc(day.year, day.month, day.day);
-    return events[dayUtc] ?? [];
+  DateTime _normalizarFecha(DateTime fecha) {
+    return DateTime(fecha.year, fecha.month, fecha.day);
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(8),
       ),
-      child: TableCalendar<Hornada>(
-        locale: 'es_ES',
+      child: TableCalendar(
+        firstDay: DateTime(2024),
+        lastDay: DateTime(2026),
         focusedDay: focusedDay,
-        firstDay: DateTime.utc(2022, 1, 1),
-        lastDay: DateTime.utc(2030, 12, 31),
         selectedDayPredicate: (day) => isSameDay(selectedDay, day),
-        calendarFormat: calendarFormat,
-        eventLoader: _getEventsForDay,
-        startingDayOfWeek: StartingDayOfWeek.monday,
-
+        locale: 'es_ES',
+        rowHeight: 40,
+        daysOfWeekHeight: 20,
         headerStyle: HeaderStyle(
           formatButtonVisible: false,
           titleCentered: true,
-          titleTextStyle: GoogleFonts.oswald(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-          leftChevronIcon: Icon(Icons.chevron_left_rounded),
-          rightChevronIcon: Icon(Icons.chevron_right_rounded),
+          titleTextStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          leftChevronIcon: Icon(Icons.chevron_left, color: Colors.black),
+          rightChevronIcon: Icon(Icons.chevron_right, color: Colors.black),
+          leftChevronMargin: EdgeInsets.all(0), // ✅ Sin márgenes extra
+          rightChevronMargin: EdgeInsets.all(0),
+          leftChevronPadding: EdgeInsets.all(4),
+          rightChevronPadding: EdgeInsets.all(4),
         ),
-
         calendarStyle: CalendarStyle(
-          weekendTextStyle: TextStyle(color: Colors.red[800]),
-          selectedDecoration: BoxDecoration(
-            color: Colors.grey,
-            shape: BoxShape.circle,
-          ),
-          selectedTextStyle: TextStyle(color: Colors.black),
+          cellMargin: EdgeInsets.all(4),
+          weekendTextStyle: TextStyle(color: Colors.red),
           todayDecoration: BoxDecoration(
             color: Colors.blue,
-            shape: BoxShape.circle,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(6),
           ),
-          markersAlignment: Alignment.bottomCenter,
-          markerDecoration: BoxDecoration(
-            color: Colors.blueGrey,
-            shape: BoxShape.circle,
+          selectedDecoration: BoxDecoration(
+            color: Colors.blue,
+            shape: BoxShape.rectangle,
+            borderRadius: BorderRadius.circular(6),
           ),
-          markersMaxCount: 3,
+          defaultTextStyle: TextStyle(color: Colors.black),
         ),
+        daysOfWeekStyle: DaysOfWeekStyle(
+          weekendStyle: TextStyle(color: Colors.red),
+          weekdayStyle: TextStyle(color: Colors.black),
+        ),
+        eventLoader: (day) {
+          final key = _normalizarFecha(day);
+          return hornadas[key] ?? [];
+        },
         calendarBuilders: CalendarBuilders(
-          markerBuilder: (context, day, hornadasDelDia) {
-            if (hornadasDelDia.isNotEmpty) {
-              return Positioned(
-                right: 1,
-                bottom: 1,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: hornadasDelDia.take(3).map((hornada) {
-                    return Container(
-                      width: 7,
-                      height: 7,
-                      margin: EdgeInsets.symmetric(horizontal: 1),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: hornada.color,
-                      ),
-                    );
-                  }).toList(),
+          defaultBuilder: (context, day, focusedDay) {
+            final key = _normalizarFecha(day);
+            final hornadasDelDia = hornadas[key];
+
+            if (hornadasDelDia != null && hornadasDelDia.isNotEmpty) {
+              final hornada = hornadasDelDia.first;
+              return Container(
+                margin: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: hornada.color,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Center(
+                  child: Text(
+                    '${day.day}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              );
+            }
+            return null;
+          },
+          selectedBuilder: (context, day, focusedDay) {
+            final key = _normalizarFecha(day);
+            final hornadasDelDia = hornadas[key];
+
+            if (hornadasDelDia != null && hornadasDelDia.isNotEmpty) {
+              final hornada = hornadasDelDia.first;
+              return Container(
+                margin: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: hornada.color,
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: Colors.blue, width: 2),
+                ),
+                child: Center(
+                  child: Text(
+                    '${day.day}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              );
+            }
+            return null;
+          },
+          todayBuilder: (context, day, focusedDay) {
+            final key = _normalizarFecha(day);
+            final hornadasDelDia = hornadas[key];
+
+            if (hornadasDelDia != null && hornadasDelDia.isNotEmpty) {
+              final hornada = hornadasDelDia.first;
+              return Container(
+                margin: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: hornada.color,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Center(
+                  child: Text(
+                    '${day.day}',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               );
             }
@@ -98,8 +149,6 @@ class HornadasCalendar extends StatelessWidget {
           },
         ),
         onDaySelected: onDaySelected,
-        onPageChanged: onPageChanged,
-        onFormatChanged: (format) {},
       ),
     );
   }
