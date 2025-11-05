@@ -9,12 +9,12 @@ class CalendarioHornada extends StatelessWidget {
   final Function(DateTime, DateTime) onDaySelected;
 
   const CalendarioHornada({
-    Key? key,
+    super.key,
     required this.focusedDay,
     required this.selectedDay,
     required this.hornadas,
     required this.onDaySelected,
-  }) : super(key: key);
+  });
 
   DateTime _normalizarFecha(DateTime fecha) {
     return DateTime(fecha.year, fecha.month, fecha.day);
@@ -30,7 +30,7 @@ class CalendarioHornada extends StatelessWidget {
       ),
       child: TableCalendar(
         firstDay: DateTime(2024),
-        lastDay: DateTime(2026),
+        lastDay: DateTime(2030),
         focusedDay: focusedDay,
         selectedDayPredicate: (day) => isSameDay(selectedDay, day),
         locale: 'es_ES',

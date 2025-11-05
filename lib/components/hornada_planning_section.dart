@@ -7,10 +7,10 @@ class ListaPlanificaciones extends StatelessWidget {
   final Function(Hornada)? onHornadaTap;
 
   const ListaPlanificaciones({
-    Key? key,
+    super.key,
     required this.hornadas,
     this.onHornadaTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

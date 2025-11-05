@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_conde_ceramicas/model/hornadas_model.dart';
 
-class DialogFinalizar extends StatelessWidget {
+class FinalizerDialog extends StatelessWidget {
   final Hornada hornada;
   final Function(Hornada) onFinalizar;
 
-  const DialogFinalizar({
-    Key? key,
+  const FinalizerDialog({
+    super.key,
     required this.hornada,
     required this.onFinalizar,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

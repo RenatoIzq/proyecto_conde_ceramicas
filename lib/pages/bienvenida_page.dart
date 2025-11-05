@@ -3,7 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_conde_ceramicas/pages/hornadas_page.dart';
 import 'package:proyecto_conde_ceramicas/pages/inventario_page.dart';
 import 'package:proyecto_conde_ceramicas/pages/reporte_page.dart';
-import 'package:proyecto_conde_ceramicas/pages/recetario_page.dart';
+import 'package:proyecto_conde_ceramicas/pages/recetas_page.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 import 'package:proyecto_conde_ceramicas/components/menu_button.dart';
 
@@ -85,7 +85,7 @@ class BienvenidaPage extends StatelessWidget {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RecetarioPage(),
+                                builder: (context) => RecetasPage(),
                               ),
                             );
                           },

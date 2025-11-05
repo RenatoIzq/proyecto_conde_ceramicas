@@ -7,7 +7,7 @@ import 'package:proyecto_conde_ceramicas/components/hornada_legend.dart';
 import 'package:proyecto_conde_ceramicas/components/hornadas_calendar.dart';
 import 'package:proyecto_conde_ceramicas/components/hornada_planning_section.dart';
 import 'package:proyecto_conde_ceramicas/dialogs/finalizer_dialog.dart';
-import 'package:proyecto_conde_ceramicas/dialogs/plafinifier_dialog.dart';
+import 'package:proyecto_conde_ceramicas/dialogs/planifier_dialog.dart';
 import 'package:proyecto_conde_ceramicas/dialogs/register_dialog.dart';
 
 class HornadasPage extends StatefulWidget {
@@ -20,7 +20,7 @@ class HornadasPage extends StatefulWidget {
 class _HornadasPageState extends State<HornadasPage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  Map<DateTime, List<Hornada>> _hornadas = {};
+  final Map<DateTime, List<Hornada>> _hornadas = {};
 
   @override
   void initState() {
@@ -158,7 +158,7 @@ class _HornadasPageState extends State<HornadasPage> {
       // Día SIN pintar: mostrar diálogo de planificación
       showDialog(
         context: context,
-        builder: (context) => DialogPlanificar(
+        builder: (context) => PlanifierDialog(
           fechaSeleccionada: dia,
           onPlanificar: _agregarHornada,
         ),
@@ -170,7 +170,7 @@ class _HornadasPageState extends State<HornadasPage> {
         // Día CON planificación: mostrar diálogo de registro
         showDialog(
           context: context,
-          builder: (context) => DialogRegistrar(
+          builder: (context) => RegisterDialog(
             hornada: hornada,
             onRegistrar: _actualizarHornada,
             onEliminar: _eliminarHornada,
@@ -180,7 +180,7 @@ class _HornadasPageState extends State<HornadasPage> {
         // Día EN CURSO: mostrar diálogo para finalizar
         showDialog(
           context: context,
-          builder: (context) => DialogFinalizar(
+          builder: (context) => FinalizerDialog(
             hornada: hornada,
             onFinalizar: _actualizarHornada,
           ),

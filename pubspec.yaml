@@ -17,6 +17,7 @@ dependencies:
   google_fonts:
   intl:
   table_calendar: 
+  image_picker: 
   cupertino_icons: ^1.0.8
 
 

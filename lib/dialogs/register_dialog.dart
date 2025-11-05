@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_conde_ceramicas/model/hornadas_model.dart';
 
-class DialogRegistrar extends StatefulWidget {
+class RegisterDialog extends StatefulWidget {
   final Hornada hornada;
   final Function(Hornada) onRegistrar;
   final Function(Hornada) onEliminar;
 
-  const DialogRegistrar({
-    Key? key,
+  const RegisterDialog({
+    super.key,
     required this.hornada,
     required this.onRegistrar,
     required this.onEliminar,
-  }) : super(key: key);
+  });
 
   @override
-  State<DialogRegistrar> createState() => _DialogRegistrarState();
+  State<RegisterDialog> createState() => _RegisterDialogState();
 }
 
-class _DialogRegistrarState extends State<DialogRegistrar> {
+class _RegisterDialogState extends State<RegisterDialog> {
   TimeOfDay horaInicioReal = TimeOfDay.now();
 
   @override
@@ -57,8 +57,8 @@ class _DialogRegistrarState extends State<DialogRegistrar> {
                 builder: (context, child) {
                   return MediaQuery(
                     data: MediaQuery.of(
-                      context,
-                    ).copyWith(alwaysUse24HourFormat: true),
+                      context
+                    ).copyWith(alwaysUse24HourFormat: false),
                     child: child!,
                   );
                 },
@@ -67,6 +67,7 @@ class _DialogRegistrarState extends State<DialogRegistrar> {
                 setState(() => horaInicioReal = time);
               }
             },
+            
             child: Row(
               children: [
                 Expanded(
