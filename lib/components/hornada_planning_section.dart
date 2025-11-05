@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:proyecto_conde_ceramicas/model/hornadas_model.dart';
+import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 
 class ListaPlanificaciones extends StatelessWidget {
   final Map<DateTime, List<Hornada>> hornadas;
@@ -22,7 +23,7 @@ class ListaPlanificaciones extends StatelessWidget {
     return Container(
       margin: EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Color(0xFF303030),
+        color: grisoscuro,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(

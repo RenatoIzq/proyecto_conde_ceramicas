@@ -45,69 +45,106 @@ class _InventarioPageState extends State<InventarioPage> {
   }
 
   void _cargarDatosDePrueba() {
-    inventarioItems = [
-      InventarioItem(
-        id: '1',
-        nombre: 'Plato Decorativo',
-        codigo: 'PROD-001',
-        tipo: 'Producto',
-        stockInicial: 100,
-        stockActual: 85,
-        unidad: 'piezas',
-        estado: EstadoInventario.disponible,
-      ),
-      InventarioItem(
-        id: '2',
-        nombre: 'Taza Cerámica',
-        codigo: 'PROD-002',
-        tipo: 'Producto',
-        stockInicial: 50,
-        stockActual: 5,
-        unidad: 'piezas',
-        estado: EstadoInventario.bajo,
-      ),
-      InventarioItem(
-        id: '3',
-        nombre: 'Arcilla Blanca',
-        codigo: 'ARC-001',
-        tipo: 'Materia Prima',
-        stockInicial: 500,
-        stockActual: 450,
-        unidad: 'kg',
-        estado: EstadoInventario.disponible,
-      ),
-      InventarioItem(
-        id: '4',
-        nombre: 'Arcilla Roja',
-        codigo: 'ARC-002',
-        tipo: 'Materia Prima',
-        stockInicial: 300,
-        stockActual: 0,
-        unidad: 'kg',
-        estado: EstadoInventario.agotado,
-      ),
-      InventarioItem(
-        id: '5',
-        nombre: 'Esmalte Azul',
-        codigo: 'ESM-001',
-        tipo: 'Esmalte',
-        stockInicial: 100,
-        stockActual: 60,
-        unidad: 'L',
-        estado: EstadoInventario.disponible,
-      ),
-      InventarioItem(
-        id: '7',
-        nombre: 'Molde Cilindro',
-        codigo: 'MOL-001',
-        tipo: 'Molde',
-        stockInicial: 20,
-        stockActual: 18,
-        unidad: 'piezas',
-        estado: EstadoInventario.disponible,
-      ),
-    ];
-  }
+  inventarioItems = [
+    // ✅ PRODUCTOS con estado de producción
+    InventarioItem(
+      id: '1',
+      nombre: 'Plato Decorativo',
+      codigo: 'PROD-001',
+      tipo: 'Producto',
+      stockInicial: 100,
+      stockActual: 85,
+      unidad: 'piezas',
+      estadoProducto: EstadoProducto.terminado,
+    ),
+    InventarioItem(
+      id: '2',
+      nombre: 'Taza Cerámica',
+      codigo: 'PROD-002',
+      tipo: 'Producto',
+      stockInicial: 50,
+      stockActual: 30,
+      unidad: 'piezas',
+      estadoProducto: EstadoProducto.esmaltado,
+    ),
+    InventarioItem(
+      id: '3',
+      nombre: 'Jarrón Grande',
+      codigo: 'PROD-003',
+      tipo: 'Producto',
+      stockInicial: 20,
+      stockActual: 15,
+      unidad: 'piezas',
+      estadoProducto: EstadoProducto.bizcocho,
+    ),
+    InventarioItem(
+      id: '4',
+      nombre: 'Maceta Pequeña',
+      codigo: 'PROD-004',
+      tipo: 'Producto',
+      stockInicial: 60,
+      stockActual: 40,
+      unidad: 'piezas',
+      estadoProducto: EstadoProducto.crudo,
+    ),
+    
+    // ✅ MATERIA PRIMA con estado de stock
+    InventarioItem(
+      id: '5',
+      nombre: 'Arcilla Blanca',
+      codigo: 'ARC-001',
+      tipo: 'Materia Prima',
+      stockInicial: 500,
+      stockActual: 450,
+      unidad: 'kg',
+      estadoStock: EstadoStock.disponible,
+    ),
+    InventarioItem(
+      id: '6',
+      nombre: 'Arcilla Roja',
+      codigo: 'ARC-002',
+      tipo: 'Materia Prima',
+      stockInicial: 300,
+      stockActual: 0,
+      unidad: 'kg',
+      estadoStock: EstadoStock.agotado,
+    ),
+    
+    // ✅ ESMALTE con estado de stock
+    InventarioItem(
+      id: '7',
+      nombre: 'Esmalte Azul',
+      codigo: 'ESM-001',
+      tipo: 'Esmalte',
+      stockInicial: 100,
+      stockActual: 60,
+      unidad: 'L',
+      estadoStock: EstadoStock.disponible,
+    ),
+    InventarioItem(
+      id: '8',
+      nombre: 'Esmalte Verde',
+      codigo: 'ESM-002',
+      tipo: 'Esmalte',
+      stockInicial: 80,
+      stockActual: 10,
+      unidad: 'L',
+      estadoStock: EstadoStock.bajo,
+    ),
+    
+    // ✅ MOLDE con estado de stock
+    InventarioItem(
+      id: '9',
+      nombre: 'Molde Cilindro',
+      codigo: 'MOL-001',
+      tipo: 'Molde',
+      stockInicial: 20,
+      stockActual: 18,
+      unidad: 'piezas',
+      estadoStock: EstadoStock.disponible,
+    ),
+  ];
+}
 
   List<InventarioItem> _obtenerItemsFiltrados() {
     return inventarioItems.where((item) {

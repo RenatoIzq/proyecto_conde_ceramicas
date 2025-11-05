@@ -65,20 +65,18 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
               TextFormField(
                 controller: nombreController,
                 decoration: InputDecoration(
-                  labelText: 'Nombre Receta *',
+                  labelText: 'Nombre Receta',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => (value?.isEmpty ?? true) ? 'Requerido' : null,
               ),
               SizedBox(height: 12),
               TextFormField(
                 controller: descripcionController,
                 decoration: InputDecoration(
-                  labelText: 'Descripción *',
+                  labelText: 'Descripción',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
-                validator: (value) => (value?.isEmpty ?? true) ? 'Requerido' : null,
               ),
               SizedBox(height: 16),
               Text(

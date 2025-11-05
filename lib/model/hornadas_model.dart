@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 
-enum HornadaEstado { Programada, EnCurso, Finalizada }
+enum HornadaEstado { programada, enCurso, finalizada }
 
-enum HornadaTipo { Bizcocho, Esmalte }
+enum HornadaTipo { bizcocho, esmalte }
 
 class Hornada {
   final String id;

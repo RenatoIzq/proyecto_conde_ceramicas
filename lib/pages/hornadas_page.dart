@@ -116,7 +116,7 @@ class _HornadasPageState extends State<HornadasPage> {
           ),
         ),
         child: Padding(
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(10),
           child: Column(
             children: [
               CalendarioHornada(
@@ -131,9 +131,9 @@ class _HornadasPageState extends State<HornadasPage> {
                   _manejarSeleccionDia(selectedDay);
                 },
               ),
-              SizedBox(height: 5),
+              SizedBox(height: 1),
               const HornadaLegend(),
-              SizedBox(height: 5),
+              SizedBox(height: 1),
               Expanded(
                 child: ListaPlanificaciones(
                   hornadas: _hornadas,
@@ -243,9 +243,6 @@ class _HornadasPageState extends State<HornadasPage> {
       _hornadas[key] = [hornada];
     });
 
-    // Simulando guardado
-    print('Hornada agregada: ${hornada.id}');
-
     // Mostrar confirmación
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -261,9 +258,6 @@ class _HornadasPageState extends State<HornadasPage> {
       final key = _normalizarFecha(hornada.fechaPlanificada);
       _hornadas[key] = [hornada];
     });
-
-    // Simulando actualización
-    print('Hornada actualizada: ${hornada.id} - Estado: ${hornada.estado}');
 
     // Mostrar confirmación
     String mensaje = hornada.estado == 'En Curso'
@@ -284,9 +278,6 @@ class _HornadasPageState extends State<HornadasPage> {
       final key = _normalizarFecha(hornada.fechaPlanificada);
       _hornadas.remove(key);
     });
-
-    // Simulando eliminación
-    print('Hornada eliminada: ${hornada.id}');
 
     // Mostrar confirmación
     ScaffoldMessenger.of(context).showSnackBar(

@@ -6,6 +6,7 @@ import 'package:proyecto_conde_ceramicas/model/inventario_model.dart';
 class InventarioAddDialog extends StatefulWidget {
   final List<String> categorias;
   final Function(InventarioItem) onGuardar;
+  
 
   const InventarioAddDialog({
     super.key,
@@ -25,6 +26,8 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
   final stockActualController = TextEditingController();
 
   late String tipoSeleccionado;
+  EstadoProducto estadoProductoSeleccionado = EstadoProducto.crudo;
+  EstadoStock estadoStockSeleccionado = EstadoStock.disponible;
   String? imagenPath;
   final ImagePicker _imagePicker = ImagePicker();
 
@@ -113,6 +116,49 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
                   if (value != null) setState(() => tipoSeleccionado = value);
                 },
               ),
+              //Si es un producto mostrar estado de produccion, si no mostrar estado de stock
+              SizedBox(height: 12),
+              if (tipoSeleccionado == 'Producto')
+                DropdownButtonFormField<EstadoProducto>(
+                  initialValue: estadoProductoSeleccionado,
+                  decoration: InputDecoration(
+                    labelText: 'Estado de Producción *',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: EstadoProducto.values.map((estado) {
+                    String texto = '';
+                    switch (estado) {
+                      case EstadoProducto.crudo:
+                        texto = 'Crudo';
+                        break;
+                      case EstadoProducto.bizcocho:
+                        texto = 'Bizcocho';
+                        break;
+                      case EstadoProducto.esmaltado:
+                        texto = 'Esmaltado';
+                        break;
+                      case EstadoProducto.terminado:
+                        texto = 'Finalizado';
+                        break;
+                    }
+                    return DropdownMenuItem(value: estado, child: Text(texto));
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) setState(() => estadoProductoSeleccionado = value);
+                  },
+                )
+              else
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Estado: Se calculará automáticamente según el stock',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ),
               SizedBox(height: 12),
               TextFormField(
                 controller: stockInicialController,
@@ -153,16 +199,29 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
+              final stockInicial = int.parse(stockInicialController.text);
+              final stockActual = int.parse(stockActualController.text);
+
               final item = InventarioItem(
                 id: DateTime.now().millisecondsSinceEpoch.toString(),
                 nombre: nombreController.text,
                 codigo: codigoController.text,
                 tipo: tipoSeleccionado,
-                stockInicial: int.parse(stockInicialController.text),
-                stockActual: int.parse(stockActualController.text),
+                stockInicial: stockInicial,
+                stockActual: stockActual,
                 unidad: 'piezas',
-                estado: EstadoInventario.disponible,
+                // ✅ Asigna los estados correctamente
+                estadoProducto: tipoSeleccionado == 'Producto'
+                    ? estadoProductoSeleccionado
+                    : null,
+                estadoStock: tipoSeleccionado != 'Producto'
+                    ? InventarioItem.determinarEstadoStock(
+                        stockActual,
+                        stockInicial,
+                      )
+                    : null,
                 imagenReferencial: imagenPath,
+
               );
               widget.onGuardar(item);
               Navigator.pop(context);

@@ -35,7 +35,7 @@ class HornadaLegend extends StatelessWidget {
             ),
           ),
 
-          SizedBox(height: 8),
+          SizedBox(height: 4),
 
           _buildLegendItem(colorBizcocho, textoBizcocho, tempBizcocho),
 

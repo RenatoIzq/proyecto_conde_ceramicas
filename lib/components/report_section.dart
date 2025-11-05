@@ -5,7 +5,7 @@ import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 class ReportSection extends StatelessWidget {
   final String title;
   final List<String> headers;
-  final List<Map<String, String>> data;
+  final List<Map<String, dynamic>> data;  // ✅ Cambió a dynamic
   final double tableHeight;
 
   const ReportSection({
@@ -13,14 +13,24 @@ class ReportSection extends StatelessWidget {
     required this.title,
     required this.headers,
     required this.data,
-    this.tableHeight = 250.0,
+    this.tableHeight = 248.0,
   });
+
+  // ✅ Obtiene el color según el estado real
+  Color _obtenerColorFila(Map<String, dynamic> row) {
+    final estado = row['estado'] ?? 'disponible';
+    
+    if (estado == 'agotado') {
+      return Colors.red[300]!;
+    } else if (estado == 'bajo') {
+      return Colors.yellow[300]!;
+    }
+    return Colors.grey[100]!;
+  }
 
   @override
   Widget build(BuildContext context) {
-    //usar theme quizas
     final Color headingColor = Colors.grey[300]!;
-    final Color rowColor = Colors.grey[100]!;
     final Color borderColor = Colors.grey[400]!;
 
     return Column(
@@ -46,7 +56,7 @@ class ReportSection extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             border: Border.all(color: borderColor),
-            borderRadius: BorderRadius.circular(5)
+            borderRadius: BorderRadius.circular(5),
           ),
           child: SizedBox(
             height: tableHeight,
@@ -58,7 +68,6 @@ class ReportSection extends StatelessWidget {
                   headingRowColor: WidgetStateColor.resolveWith(
                     (states) => headingColor,
                   ),
-                  dataRowColor: WidgetStateColor.resolveWith((states) => rowColor),
                   dividerThickness: 1,
                 ),
                 child: DataTable(
@@ -79,20 +88,28 @@ class ReportSection extends StatelessWidget {
                         textAlign: TextAlign.center,
                       ),
                     ),
-                  ),).toList(),
-                  rows: data.map((row) => DataRow(
-                    cells: headers.map((header) {
-                      final cellValue = row[header.toLowerCase()] ?? 'N/A';
+                  )).toList(),
+                  rows: data.map((row) {
+                    final colorFila = _obtenerColorFila(row);
+
+                    return DataRow(
+                      color: WidgetStateProperty.all(colorFila),
+                      cells: headers.map((header) {
+                        final cellValue = row[header.toLowerCase()] ?? 'N/A';
                         return DataCell(
                           Center(
                             child: Text(
-                              cellValue,
-                              style: GoogleFonts.oswald(color: Colors.black),
+                              cellValue.toString(),
+                              style: GoogleFonts.oswald(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         );
                       }).toList(),
-                  ),).toList(),
+                    );
+                  }).toList(),
                 ),
               ),
             ),

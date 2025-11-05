@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-enum EstadoInventario { disponible, bajo, agotado }
+enum EstadoProducto { crudo, bizcocho, esmaltado, terminado }
+
+enum EstadoStock { disponible, bajo, agotado }
 
 class InventarioItem {
   final String id;
@@ -10,7 +12,8 @@ class InventarioItem {
   final int stockInicial;
   final int stockActual;
   final String unidad;
-  final EstadoInventario estado;
+  final EstadoProducto? estadoProducto;
+  final EstadoStock? estadoStock;
   final String? imagenReferencial;
 
   InventarioItem({
@@ -21,15 +24,23 @@ class InventarioItem {
     required this.stockInicial,
     required this.stockActual,
     required this.unidad,
-    required this.estado,
+    this.estadoProducto,
+    this.estadoStock,
     this.imagenReferencial,
-  });
+  }) : assert(
+         // ✅ Validación: Productos deben tener estadoProducto, otros estadoStock
+         (tipo == 'Producto' && estadoProducto != null) ||
+             (tipo != 'Producto' && estadoStock != null),
+         'Estado incorrecto para el tipo de item',
+       );
 
   // Determina estado automáticamente basado en stock
-  static EstadoInventario _determinarEstado(int stockActual, int stockInicial) {
-    if (stockActual == 0) return EstadoInventario.agotado;
-    if (stockActual < (stockInicial * 0.2)) return EstadoInventario.bajo;
-    return EstadoInventario.disponible;
+  static EstadoStock determinarEstadoStock(int stockActual, int stockInicial) {
+    if (stockActual == 0) return EstadoStock.agotado;
+    if (stockActual < (stockInicial * 0.3)) {
+      return EstadoStock.bajo;
+    } // Umbral del 30%
+    return EstadoStock.disponible;
   }
 
   InventarioItem copyWith({
@@ -40,43 +51,79 @@ class InventarioItem {
     int? stockInicial,
     int? stockActual,
     String? unidad,
-    EstadoInventario? estado,
+    EstadoProducto? estadoProducto,
+    EstadoStock? estadoStock,
     String? imagenReferencial,
   }) {
     final nuevoStock = stockActual ?? this.stockActual;
     final nuevoInicial = stockInicial ?? this.stockInicial;
+    final nuevoTipo = tipo ?? this.tipo;
+
     return InventarioItem(
       id: id ?? this.id,
       nombre: nombre ?? this.nombre,
       codigo: codigo ?? this.codigo,
-      tipo: tipo ?? this.tipo,
+      tipo: nuevoTipo,
       stockInicial: nuevoInicial,
       stockActual: nuevoStock,
       unidad: unidad ?? this.unidad,
-      estado: _determinarEstado(nuevoStock, nuevoInicial),
+      estadoProducto: nuevoTipo == 'Producto'
+          ? (estadoProducto ?? this.estadoProducto)
+          : null,
+      estadoStock: nuevoTipo != 'Producto'
+          ? determinarEstadoStock(nuevoStock, nuevoInicial)
+          : null,
       imagenReferencial: imagenReferencial ?? this.imagenReferencial,
     );
   }
 
   Color getEstadoColor() {
-    switch (estado) {
-      case EstadoInventario.disponible:
-        return Colors.green;
-      case EstadoInventario.bajo:
-        return Colors.orange;
-      case EstadoInventario.agotado:
-        return Colors.red;
+    if (tipo == 'Producto' && estadoProducto != null) {
+      switch (estadoProducto!) {
+        case EstadoProducto.crudo:
+          return Colors.grey;
+        case EstadoProducto.bizcocho:
+          return Colors.green;
+        case EstadoProducto.esmaltado:
+          return Colors.red;
+        case EstadoProducto.terminado:
+          return Colors.blue;
+      }
+    } else if (estadoStock != null) {
+      switch (estadoStock!) {
+        case EstadoStock.disponible:
+          return Colors.green;
+        case EstadoStock.bajo:
+          return Colors.orange;
+        case EstadoStock.agotado:
+          return Colors.red;
+      }
     }
+    return Colors.grey;
   }
 
   String getEstadoTexto() {
-    switch (estado) {
-      case EstadoInventario.disponible:
-        return 'Disponible';
-      case EstadoInventario.bajo:
-        return 'Stock Bajo';
-      case EstadoInventario.agotado:
-        return 'Agotado';
+    if (tipo == 'Producto' && estadoProducto != null) {
+      switch (estadoProducto!) {
+        case EstadoProducto.crudo:
+          return 'Crudo';
+        case EstadoProducto.bizcocho:
+          return 'Bizcocho';
+        case EstadoProducto.esmaltado:
+          return 'Esmaltado';
+        case EstadoProducto.terminado:
+          return 'Terminado';
+      }
+    } else if (estadoStock != null) {
+      switch (estadoStock!) {
+        case EstadoStock.disponible:
+          return 'Disponible';
+        case EstadoStock.bajo:
+          return 'Stock Bajo';
+        case EstadoStock.agotado:
+          return 'Agotado';
+      }
     }
+    return 'Sin estado';
   }
 }

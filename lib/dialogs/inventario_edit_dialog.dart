@@ -20,29 +20,32 @@ class InventarioEditDialog extends StatefulWidget {
 }
 
 class _InventarioEditDialogState extends State<InventarioEditDialog> {
-  late GlobalKey<FormState> _formKey;
+  final _formKey = GlobalKey<FormState>();
   late TextEditingController nombreController;
   late TextEditingController codigoController;
   late TextEditingController stockInicialController;
   late TextEditingController stockActualController;
-  
+
   late String tipoSeleccionado;
+  late EstadoProducto estadoProductoSeleccionado; 
+  late EstadoStock estadoStockSeleccionado; 
   String? imagenPath;
   final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    _formKey = GlobalKey<FormState>();
     nombreController = TextEditingController(text: widget.item.nombre);
     codigoController = TextEditingController(text: widget.item.codigo);
-    stockInicialController = TextEditingController(
-      text: widget.item.stockInicial.toString(),
-    );
-    stockActualController = TextEditingController(
-      text: widget.item.stockActual.toString(),
-    );
+    stockInicialController =
+        TextEditingController(text: widget.item.stockInicial.toString());
+    stockActualController =
+        TextEditingController(text: widget.item.stockActual.toString());
     tipoSeleccionado = widget.item.tipo;
+    estadoProductoSeleccionado =
+        widget.item.estadoProducto ?? EstadoProducto.crudo;
+    estadoStockSeleccionado =
+        widget.item.estadoStock ?? EstadoStock.disponible;
     imagenPath = widget.item.imagenReferencial;
   }
 
@@ -94,48 +97,117 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                 icon: Icon(Icons.photo),
                 label: Text('Cambiar Imagen'),
               ),
-              SizedBox(height: 16),
-              TextFormField(
-                controller: codigoController,
-                decoration: InputDecoration(
-                  labelText: 'Código *',
-                  border: OutlineInputBorder(),
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[100],
                 ),
-                validator: (value) => (value?.isEmpty ?? true) ? 'Requerido' : null,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Código',
+                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          codigoController.text,
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                    Icon(Icons.lock, color: Colors.grey),
+                  ],
+                ),
               ),
+              SizedBox(height: 12),
               SizedBox(height: 12),
               TextFormField(
                 controller: nombreController,
                 decoration: InputDecoration(
-                  labelText: 'Nombre *',
+                  labelText: 'Nombre',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => (value?.isEmpty ?? true) ? 'Requerido' : null,
               ),
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: tipoSeleccionado,
+                initialValue: tipoSeleccionado,
                 decoration: InputDecoration(
-                  labelText: 'Categoría *',
+                  labelText: 'Categoría',
                   border: OutlineInputBorder(),
                 ),
                 items: widget.categorias.map((tipo) {
                   return DropdownMenuItem(value: tipo, child: Text(tipo));
                 }).toList(),
                 onChanged: (value) {
-                  if (value != null) setState(() => tipoSeleccionado = value);
+                  if (value != null) {
+                    setState(() {
+                      tipoSeleccionado = value;
+                      estadoProductoSeleccionado = EstadoProducto.crudo;
+                      estadoStockSeleccionado = EstadoStock.disponible;
+                    });
+                  }
                 },
               ),
+              SizedBox(height: 12),
+              // ✅ DROPDOWN DE ESTADO (solo para Productos)
+              if (tipoSeleccionado == 'Producto')
+                DropdownButtonFormField<EstadoProducto>(
+                  initialValue: estadoProductoSeleccionado,
+                  decoration: InputDecoration(
+                    labelText: 'Estado de Producción',
+                    border: OutlineInputBorder(),
+                  ),
+                  items: EstadoProducto.values.map((estado) {
+                    String texto = '';
+                    switch (estado) {
+                      case EstadoProducto.crudo:
+                        texto = 'Crudo';
+                        break;
+                      case EstadoProducto.bizcocho:
+                        texto = 'Bizcocho';
+                        break;
+                      case EstadoProducto.esmaltado:
+                        texto = 'Esmaltado';
+                        break;
+                      case EstadoProducto.terminado:
+                        texto = 'Finalizado';
+                        break;
+                    }
+                    return DropdownMenuItem(value: estado, child: Text(texto));
+                  }).toList(),
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => estadoProductoSeleccionado = value);
+                    }
+                  },
+                )
+              else
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[100],
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'Estado: Se calculará automáticamente según el stock',
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  ),
+                ),
               SizedBox(height: 12),
               TextFormField(
                 controller: stockInicialController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Stock Inicial *',
+                  labelText: 'Stock Inicial',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Requerido';
                   if (int.tryParse(value!) == null) return 'Debe ser un número';
                   return null;
                 },
@@ -145,11 +217,10 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                 controller: stockActualController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: 'Stock Actual *',
+                  labelText: 'Stock Actual',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {
-                  if (value?.isEmpty ?? true) return 'Requerido';
                   if (int.tryParse(value!) == null) return 'Debe ser un número';
                   return null;
                 },
@@ -166,12 +237,17 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
+              final stockInicial = int.parse(stockInicialController.text);
+              final stockActual = int.parse(stockActualController.text);
+
               final itemActualizado = widget.item.copyWith(
                 nombre: nombreController.text,
-                codigo: codigoController.text,
                 tipo: tipoSeleccionado,
-                stockInicial: int.parse(stockInicialController.text),
-                stockActual: int.parse(stockActualController.text),
+                stockInicial: stockInicial,
+                stockActual: stockActual,
+                estadoProducto: tipoSeleccionado == 'Producto'
+                    ? estadoProductoSeleccionado
+                    : null,
                 imagenReferencial: imagenPath,
               );
               widget.onGuardar(itemActualizado);
