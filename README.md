@@ -21,39 +21,42 @@ flutter run o a traves del ./lib/main.dart
 
 ## 📁 Estructura de Proyecto
 
-images/
-└── CONDECERAMICA-02.png
-lib/
-├── main.dart
-├── pages/
-│ ├── bienvenida_page.dart
-│ ├── inventario_page.dart
-│ ├── recetas_page.dart
-│ ├── hornadas_page.dart
-│ └── reporte_page.dart
-│  
-├── model/
-│ ├── inventario_model.dart
-│ ├── receta_model.dart
-│ └── hornadas_model.dart
-│
-├── dialogs/
-│ ├── inventario_add_dialog.dart
-│ ├── inventario_edit_dialog.dart
-│ ├── inventario_detail_dialog.dart
-│ ├── receta_add_dialog.dart
-│ ├── receta_edit_dialog.dart
-│ ├── receta_detail_dialog.dart
-│ ├── delete_dialog.dart
-│ └── ...
-├── components/
-│ ├── action_button.dart
-│ ├── search_filter_bar.dart
-│ ├── report_section.dart
-│ └── ...
-├── themes/
- └── themes.dart
-pubspec.yaml
+proyecto_conde_ceramicas/
+├── lib/
+│   ├── main.dart
+│   ├── pages/
+│   │   ├── bienvenida_page.dart
+│   │   ├── inventario_page.dart
+│   │   ├── recetas_page.dart
+│   │   ├── hornadas_page.dart
+│   │   └── reporte_page.dart
+│   ├── model/
+│   │   ├── inventario_model.dart
+│   │   ├── receta_model.dart
+│   │   └── hornada_model.dart
+│   ├── dialogs/
+│   │   ├── inventario_add_dialog.dart
+│   │   ├── inventario_edit_dialog.dart
+│   │   ├── inventario_detail_dialog.dart
+│   │   ├── receta_add_dialog.dart
+│   │   ├── receta_edit_dialog.dart
+│   │   ├── receta_detail_dialog.dart
+│   │   ├── generic_delete_dialog.dart
+│   │   ├── delete_dialog.dart
+│   │   └── hornada_add_dialog.dart
+│   ├── components/
+│   │   ├── action_button.dart
+│   │   ├── search_filter_bar.dart
+│   │   └── report_section.dart
+│   └── themes/
+│       └── themes.dart
+├── images/
+│   ├── CONDECERAMICA_Mesa de trabajo 1
+│   ├── condeceramicalogo
+│   └── CONDECERAMICA-02.png
+├── pubspec.yaml
+└── README.md
+
 
 ## 👤 Autor
 
