@@ -2,15 +2,60 @@
 
 A new Flutter project.
 
-## Getting Started
+## 🚀 Instalación
 
-This project is a starting point for a Flutter application.
+### Requisitos
+- Flutter SDK (3.0 o superior)
+- Android Studio / VS Code
+- Dart SDK
 
-A few resources to get you started if this is your first Flutter project:
+### Pasos
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. **Clonar el repositorio**
+[git clone ](https://github.com/RenatoIzq/proyecto_conde_ceramicas.git)
+2. **Instalar dependencias**
+flutter pub get
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+3. **Ejecutar la aplicación**
+flutter run o a traves del ./lib/main.dart
+
+## 📁 Estructura de Proyecto
+
+images/
+└── CONDECERAMICA-02.png
+lib/
+├── main.dart
+├── pages/
+│ ├── bienvenida_page.dart
+│ ├── inventario_page.dart
+│ ├── recetas_page.dart
+│ ├── hornadas_page.dart
+│ └── reporte_page.dart
+│  
+├── model/
+│ ├── inventario_model.dart
+│ ├── receta_model.dart
+│ └── hornadas_model.dart
+│
+├── dialogs/
+│ ├── inventario_add_dialog.dart
+│ ├── inventario_edit_dialog.dart
+│ ├── inventario_detail_dialog.dart
+│ ├── receta_add_dialog.dart
+│ ├── receta_edit_dialog.dart
+│ ├── receta_detail_dialog.dart
+│ ├── delete_dialog.dart
+│ └── ...
+├── components/
+│ ├── action_button.dart
+│ ├── search_filter_bar.dart
+│ ├── report_section.dart
+│ └── ...
+├── themes/
+ └── themes.dart
+pubspec.yaml
+
+## 👤 Autor
+
+Hecho por Renato Izquierdo Conde
+Proyecto de gestión para Conde Cerámica
