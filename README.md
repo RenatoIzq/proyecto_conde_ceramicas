@@ -21,6 +21,7 @@ flutter run o a traves del ./lib/main.dart
 
 ## 📁 Estructura de Proyecto
 
+```
 proyecto_conde_ceramicas/
 ├── lib/
 │   ├── main.dart
@@ -56,7 +57,7 @@ proyecto_conde_ceramicas/
 │   └── CONDECERAMICA-02.png
 ├── pubspec.yaml
 └── README.md
-
+```
 
 ## 👤 Autor
 
