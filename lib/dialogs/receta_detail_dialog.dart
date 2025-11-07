@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_conde_ceramicas/model/receta_model.dart';
@@ -47,10 +49,45 @@ class RecetaDetailDialog extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        if (receta.imagenReferencial != null)
+                          Container(
+                            height: 120,
+                            width: double.infinity,
+                            margin: EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.deepOrange, width: 2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Image.file(
+                                File(receta.imagenReferencial!),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.grey[200],
+                                    child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                                  );
+                                },
+                              ),
+                            ),
+                          )
+                        else
+                          Container(
+                            height: 120,
+                            width: double.infinity,
+                            margin: EdgeInsets.only(bottom: 12),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.deepOrange, width: 2),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(Icons.palette, size: 80, color: Colors.deepOrange),
+                          ), 
+                        SizedBox(height: 2),    
                         Text(
                           'Nombre',
                           style: TextStyle(
-                            fontSize: 12,
+                            fontSize: 14,
                             color: Colors.grey[600],
                             fontWeight: FontWeight.bold,
                           ),

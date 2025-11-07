@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_conde_ceramicas/components/action_button.dart';
@@ -42,6 +44,21 @@ class _InventarioPageState extends State<InventarioPage> {
   void dispose() {
     searchController.dispose();
     super.dispose();
+  }
+
+  IconData _getIconoPorTipo(String tipo) {
+    switch (tipo) {
+      case 'Producto':
+        return Icons.shopping_bag;
+      case 'Materia Prima':
+        return Icons.grass;
+      case 'Esmalte':
+        return Icons.palette;
+      case 'Molde':
+        return Icons.category;
+      default:
+        return Icons.inventory;
+    }
   }
 
   void _cargarDatosDePrueba() {
@@ -356,19 +373,32 @@ class _InventarioPageState extends State<InventarioPage> {
                                 );
                               },
                               leading: Container(
-                                width: 50,
+                                width: 75,
+                                height: 75,
                                 decoration: BoxDecoration(
-                                  color: item.getEstadoColor(),
+                                  color: Colors.grey,
                                   borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: item.getEstadoColor(), width: 2,)
                                 ),
-                                child: Center(
-                                  child: Text(
-                                    item.stockActual.toString(),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(6),
+                                  child: item.imagenReferencial != null
+                                      ? Image.file(
+                                          File(item.imagenReferencial!),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Icon(
+                                              Icons.broken_image,
+                                              color: Colors.grey,
+                                              size: 40,
+                                            );
+                                          },
+                                        )
+                                      : Icon(
+                                          _getIconoPorTipo(item.tipo),
+                                          color: item.getEstadoColor(),
+                                          size: 40,
+                                        ),
                                 ),
                               ),
                               title: Text(

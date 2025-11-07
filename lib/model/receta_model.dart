@@ -27,12 +27,14 @@ class Receta {
   final String nombre;
   final String descripcion;
   final List<RecetaMateriaPrima> materiaPrima;
+  final String? imagenReferencial;
 
   Receta({
     required this.id,
     required this.nombre,
     required this.descripcion,
     required this.materiaPrima,
+    this.imagenReferencial
   });
 
   Receta copyWith({
@@ -40,12 +42,14 @@ class Receta {
     String? nombre,
     String? descripcion,
     List<RecetaMateriaPrima>? materiaPrima,
+    String? imagenReferencial,
   }) {
     return Receta(
       id: id ?? this.id,
       nombre: nombre ?? this.nombre,
       descripcion: descripcion ?? this.descripcion,
       materiaPrima: materiaPrima ?? this.materiaPrima,
+      imagenReferencial: imagenReferencial ?? this.imagenReferencial,
     );
   }
 }

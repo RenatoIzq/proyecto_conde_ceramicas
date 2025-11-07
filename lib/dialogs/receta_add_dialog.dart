@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:proyecto_conde_ceramicas/model/receta_model.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RecetaAddDialog extends StatefulWidget {
   final Function(Receta) onGuardar;
@@ -42,6 +45,20 @@ class _RecetaAddDialogState extends State<RecetaAddDialog> {
     setState(() => materiaPrima.removeAt(index));
   }
 
+  String? imagenPath;
+  final ImagePicker _imagePicker = ImagePicker();
+
+  Future<void> _seleccionarImagen() async {
+    final XFile? imagen = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+      maxHeight: 800,
+    );
+    if (imagen != null) {
+      setState(() => imagenPath = imagen.path);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -52,6 +69,35 @@ class _RecetaAddDialogState extends State<RecetaAddDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Container(
+                height: 150,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[200],
+                ),
+                child: imagenPath != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          File(imagenPath!),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Icon(Icons.image, size: 50, color: Colors.grey),
+              ),
+              SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: _seleccionarImagen,
+                icon: Icon(Icons.photo),
+                label: Text('Seleccionar Imagen'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: nombreController,
                 decoration: InputDecoration(
@@ -147,6 +193,7 @@ class _RecetaAddDialogState extends State<RecetaAddDialog> {
                 nombre: nombreController.text,
                 descripcion: descripcionController.text,
                 materiaPrima: materiaPrima,
+                imagenReferencial: imagenPath
               );
               widget.onGuardar(receta);
               Navigator.pop(context);

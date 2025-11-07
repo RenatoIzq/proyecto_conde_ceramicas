@@ -81,7 +81,7 @@ class InventarioItem {
     if (tipo == 'Producto' && estadoProducto != null) {
       switch (estadoProducto!) {
         case EstadoProducto.crudo:
-          return Colors.grey;
+          return Colors.grey[600]!;
         case EstadoProducto.bizcocho:
           return Colors.green;
         case EstadoProducto.esmaltado:

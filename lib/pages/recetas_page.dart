@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_conde_ceramicas/components/action_button.dart';
@@ -266,16 +268,35 @@ class _RecetasPageState extends State<RecetasPage> {
                                 );
                               },
                               leading: Container(
-                                width: 50,
+                                width: 80,
+                                height: 80,
                                 decoration: BoxDecoration(
-                                  color: Colors.deepOrange,
+                                  color: Colors.grey[200],
                                   borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.local_florist,
-                                    color: Colors.white,
+                                  border: Border.all(
+                                    color: Colors.deepOrange,
+                                    width: 3,
                                   ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(5),
+                                  child: receta.imagenReferencial != null
+                                      ? Image.file(
+                                          File(receta.imagenReferencial!),
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Icon(
+                                              Icons.broken_image,
+                                              color: Colors.grey,
+                                              size: 30,
+                                            );
+                                          },
+                                        )
+                                      : Icon(
+                                          Icons.palette,
+                                          color: Colors.deepOrange,
+                                          size: 30,
+                                        ),
                                 ),
                               ),
                               title: Text(

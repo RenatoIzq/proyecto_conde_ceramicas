@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_conde_ceramicas/model/receta_model.dart';
 
 class RecetaEditDialog extends StatefulWidget {
@@ -21,12 +24,16 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
   late TextEditingController descripcionController;
   late List<RecetaMateriaPrima> materiaPrima;
 
+  String? imagenPath;
+  final ImagePicker _imagePicker = ImagePicker();
+
   @override
   void initState() {
     super.initState();
     nombreController = TextEditingController(text: widget.receta.nombre);
     descripcionController = TextEditingController(text: widget.receta.descripcion);
     materiaPrima = List.from(widget.receta.materiaPrima);
+    imagenPath = widget.receta.imagenReferencial;
   }
 
   @override
@@ -34,6 +41,17 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
     nombreController.dispose();
     descripcionController.dispose();
     super.dispose();
+  }
+
+  Future<void> _seleccionarImagen() async {
+    final XFile? imagen = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 800,
+      maxHeight: 800,
+    );
+    if (imagen != null) {
+      setState(() => imagenPath = imagen.path);
+    }
   }
 
   void _agregarMateriaPrima() {
@@ -62,6 +80,35 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              Container(
+                height: 150,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[200],
+                ),
+                child: imagenPath != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(
+                          File(imagenPath!),
+                          fit: BoxFit.cover,
+                        ),
+                      )
+                    : Icon(Icons.image, size: 50, color: Colors.grey),
+              ),
+              SizedBox(height: 8),
+              ElevatedButton.icon(
+                onPressed: _seleccionarImagen,
+                icon: Icon(Icons.photo),
+                label: Text('Cambiar Imagen'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.deepOrange,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              SizedBox(height: 16),
               TextFormField(
                 controller: nombreController,
                 decoration: InputDecoration(
@@ -150,10 +197,20 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
+              if (materiaPrima.isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Añade al menos una materia prima'),
+                    backgroundColor: Colors.orange,
+                  ),
+                );
+                return;
+              }
               final recetaActualizada = widget.receta.copyWith(
                 nombre: nombreController.text,
                 descripcion: descripcionController.text,
                 materiaPrima: materiaPrima,
+                imagenReferencial: imagenPath,
               );
               widget.onGuardar(recetaActualizada);
               Navigator.pop(context);
