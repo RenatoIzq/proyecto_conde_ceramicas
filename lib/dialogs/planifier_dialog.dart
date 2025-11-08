@@ -36,106 +36,101 @@ class _PlanifierDialogState extends State<PlanifierDialog> {
       insetPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       title: Text('Planificar Hornada'),
       content: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.6,
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Fecha (solo lectura)
-                TextFormField(
-                  enabled: false,
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Fecha (solo lectura)
+              TextFormField(
+                enabled: false,
+                decoration: InputDecoration(
+                  labelText: 'Fecha',
+                  border: OutlineInputBorder(),
+                ),
+                initialValue: DateFormat(
+                  'dd/MM/yyyy',
+                ).format(widget.fechaSeleccionada),
+              ),
+              SizedBox(height: 12),
+
+              // Hora Inicio
+              InkWell(
+                onTap: () async {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime: horaInicio,
+                    builder: (context, child) {
+                      return MediaQuery(
+                        data: MediaQuery.of(
+                          context,
+                        ).copyWith(alwaysUse24HourFormat: false),
+                        child: child!,
+                      );
+                    },
+                  );
+                  if (time != null) {
+                    setState(() => horaInicio = time);
+                  }
+                },
+                child: InputDecorator(
                   decoration: InputDecoration(
-                    labelText: 'Fecha',
+                    labelText: 'Hora Inicio',
                     border: OutlineInputBorder(),
                   ),
-                  initialValue: DateFormat(
-                    'dd/MM/yyyy',
-                  ).format(widget.fechaSeleccionada),
-                ),
-                SizedBox(height: 12),
-          
-                // Hora Inicio
-                InkWell(
-                  onTap: () async {
-                    final time = await showTimePicker(
-                      context: context,
-                      initialTime: horaInicio,
-                      builder: (context, child) {
-                        return MediaQuery(
-                          data: MediaQuery.of(
-                            context,
-                          ).copyWith(alwaysUse24HourFormat: false),
-                          child: child!,
-                        );
-                      },
-                    );
-                    if (time != null) {
-                      setState(() => horaInicio = time);
-                    }
-                  },
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                      labelText: 'Hora Inicio',
-                      border: OutlineInputBorder(),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(horaInicio.format(context)),
-                        Icon(Icons.access_time),
-                      ],
-                    ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(horaInicio.format(context)),
+                      Icon(Icons.access_time),
+                    ],
                   ),
                 ),
-                SizedBox(height: 12),
-          
-                // Perfil de Temperatura
-                DropdownButtonFormField<String>(
-                  initialValue: perfilSeleccionado,
-                  decoration: InputDecoration(
-                    labelText: 'Perfil de Temperatura',
-                    border: OutlineInputBorder(),
-                  ),
-                  items: ['Bizcocho', 'Esmalte'].map((perfil) {
-                    return DropdownMenuItem(value: perfil, child: Text(perfil));
-                  }).toList(),
-                  onChanged: (value) {
-                    setState(() => perfilSeleccionado = value!);
-                  },
+              ),
+              SizedBox(height: 12),
+
+              // Perfil de Temperatura
+              DropdownButtonFormField<String>(
+                initialValue: perfilSeleccionado,
+                decoration: InputDecoration(
+                  labelText: 'Perfil de Temperatura',
+                  border: OutlineInputBorder(),
                 ),
-                SizedBox(height: 12),
-          
-                // Horno
-                TextFormField(
-                  controller: hornoController,
-                  decoration: InputDecoration(
-                    labelText: 'Horno',
-                    border: OutlineInputBorder(),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Campo requerido';
-                    }
-                    return null;
-                  },
+                items: ['Bizcocho', 'Esmalte'].map((perfil) {
+                  return DropdownMenuItem(value: perfil, child: Text(perfil));
+                }).toList(),
+                onChanged: (value) {
+                  setState(() => perfilSeleccionado = value!);
+                },
+              ),
+              SizedBox(height: 12),
+
+              // Horno
+              TextFormField(
+                controller: hornoController,
+                decoration: InputDecoration(
+                  labelText: 'Horno',
+                  border: OutlineInputBorder(),
                 ),
-                SizedBox(height: 12),
-          
-                // Observaciones
-                TextFormField(
-                  controller: observacionesController,
-                  decoration: InputDecoration(
-                    labelText: 'Observaciones',
-                    border: OutlineInputBorder(),
-                  ),
-                  maxLines: 3,
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Campo requerido';
+                  }
+                  return null;
+                },
+              ),
+              SizedBox(height: 12),
+
+              // Observaciones
+              TextFormField(
+                controller: observacionesController,
+                decoration: InputDecoration(
+                  labelText: 'Observaciones',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-            ),
+                maxLines: 3,
+              ),
+            ],
           ),
         ),
       ),

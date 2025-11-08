@@ -120,39 +120,49 @@ class ReportePage extends StatelessWidget {
 
   // ✅ Filtra esmaltes con stock bajo o agotado
   List<Map<String, dynamic>> _obtenerEsmaltesConStockBajo(
-      List<InventarioItem> inventarioItems) {
+    List<InventarioItem> inventarioItems,
+  ) {
     return inventarioItems
-        .where((item) =>
-            item.tipo == 'Esmalte' &&
-            (item.estadoStock == EstadoStock.bajo ||
-                item.estadoStock == EstadoStock.agotado))
-        .map((item) => {
-              'id': item.codigo,
-              'nombre': item.nombre,
-              'stock': '${item.stockActual} ${item.unidad}',
-              'estado': item.estadoStock == EstadoStock.agotado
+        .where(
+          (item) =>
+              item.tipo == 'Esmalte' &&
+              (item.estadoStock == EstadoStock.bajo ||
+                  item.estadoStock == EstadoStock.agotado),
+        )
+        .map(
+          (item) => {
+            'id': item.codigo,
+            'nombre': item.nombre,
+            'stock': '${item.stockActual} ${item.unidad}',
+            'estado': item.estadoStock == EstadoStock.agotado
                 ? 'agotado'
                 : 'bajo', // ✅ NUEVO
-            })
+          },
+        )
         .toList();
   }
 
   // ✅ Filtra materias primas con stock bajo o agotado
   List<Map<String, dynamic>> _obtenerMateriasPrimasConStockBajo(
-      List<InventarioItem> inventarioItems) {
+    List<InventarioItem> inventarioItems,
+  ) {
     return inventarioItems
-        .where((item) =>
-            item.tipo == 'Materia Prima' &&
-            (item.estadoStock == EstadoStock.bajo ||
-                item.estadoStock == EstadoStock.agotado))
-        .map((item) => {
-              'id': item.codigo,
-              'nombre': item.nombre,
-              'stock': '${item.stockActual} ${item.unidad}',
-              'estado': item.estadoStock == EstadoStock.agotado
+        .where(
+          (item) =>
+              item.tipo == 'Materia Prima' &&
+              (item.estadoStock == EstadoStock.bajo ||
+                  item.estadoStock == EstadoStock.agotado),
+        )
+        .map(
+          (item) => {
+            'id': item.codigo,
+            'nombre': item.nombre,
+            'stock': '${item.stockActual} ${item.unidad}',
+            'estado': item.estadoStock == EstadoStock.agotado
                 ? 'agotado'
                 : 'bajo', // ✅ NUEVO
-            })
+          },
+        )
         .toList();
   }
 
@@ -161,7 +171,9 @@ class ReportePage extends StatelessWidget {
     // ✅ Obtiene los datos de prueba
     final inventarioItems = _obtenerDatos();
     final esmaltesData = _obtenerEsmaltesConStockBajo(inventarioItems);
-    final materiasPrimasData = _obtenerMateriasPrimasConStockBajo(inventarioItems);
+    final materiasPrimasData = _obtenerMateriasPrimasConStockBajo(
+      inventarioItems,
+    );
     final List<String> headers = ['ID', 'Nombre', 'Stock'];
 
     return Scaffold(
@@ -197,68 +209,80 @@ class ReportePage extends StatelessWidget {
             colors: [Colors.white, Colors.black],
           ),
         ),
-        child: ListView(
-          padding: EdgeInsets.all(16),
-          children: [
-            // ✅ Esmaltes con stock bajo
-            if (esmaltesData.isEmpty)
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  border: Border.all(color: Colors.green),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.green),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Todos los esmaltes tienen stock suficiente',
-                        style: TextStyle(color: Colors.green[800]),
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  kToolbarHeight -
+                  MediaQuery.of(context).padding.top,
+            ),
+            child: Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                children: [
+                  // ✅ Esmaltes con stock bajo
+                  if (esmaltesData.isEmpty)
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        border: Border.all(color: Colors.green),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.green),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Todos los esmaltes tienen stock suficiente',
+                              style: TextStyle(color: Colors.green[800]),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    ReportSection(
+                      title: 'Esmaltes con Stock Bajo',
+                      headers: headers,
+                      data: esmaltesData,
                     ),
-                  ],
-                ),
-              )
-            else
-              ReportSection(
-                title: 'Esmaltes con Stock Bajo',
-                headers: headers,
-                data: esmaltesData,
-              ),
-            SizedBox(height: 25),
+                  SizedBox(height: 25),
 
-            // ✅ Materias primas con stock bajo
-            if (materiasPrimasData.isEmpty)
-              Container(
-                padding: EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.green[50],
-                  border: Border.all(color: Colors.green),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.check_circle, color: Colors.green),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Todas las materias primas tienen stock suficiente',
-                        style: TextStyle(color: Colors.green[800]),
+                  // ✅ Materias primas con stock bajo
+                  if (materiasPrimasData.isEmpty)
+                    Container(
+                      padding: EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.green[50],
+                        border: Border.all(color: Colors.green),
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.check_circle, color: Colors.green),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Todas las materias primas tienen stock suficiente',
+                              style: TextStyle(color: Colors.green[800]),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  else
+                    ReportSection(
+                      title: 'Materias Primas con Stock Bajo',
+                      headers: headers,
+                      data: materiasPrimasData,
                     ),
-                  ],
-                ),
-              )
-            else
-              ReportSection(
-                title: 'Materias Primas con Stock Bajo',
-                headers: headers,
-                data: materiasPrimasData,
+                ],
               ),
-          ],
+            ),
+          ),
         ),
       ),
     );
