@@ -25,10 +25,11 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
   late TextEditingController codigoController;
   late TextEditingController stockInicialController;
   late TextEditingController stockActualController;
+  late TextEditingController unidadController;
 
   late String tipoSeleccionado;
-  late EstadoProducto estadoProductoSeleccionado; 
-  late EstadoStock estadoStockSeleccionado; 
+  late EstadoProducto estadoProductoSeleccionado;
+  late EstadoStock estadoStockSeleccionado;
   String? imagenPath;
   final ImagePicker _imagePicker = ImagePicker();
 
@@ -37,15 +38,17 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
     super.initState();
     nombreController = TextEditingController(text: widget.item.nombre);
     codigoController = TextEditingController(text: widget.item.codigo);
-    stockInicialController =
-        TextEditingController(text: widget.item.stockInicial.toString());
-    stockActualController =
-        TextEditingController(text: widget.item.stockActual.toString());
+    stockInicialController = TextEditingController(
+      text: widget.item.stockInicial.toString(),
+    );
+    stockActualController = TextEditingController(
+      text: widget.item.stockActual.toString(),
+    );
+    unidadController = TextEditingController(text: widget.item.unidad);
     tipoSeleccionado = widget.item.tipo;
     estadoProductoSeleccionado =
         widget.item.estadoProducto ?? EstadoProducto.crudo;
-    estadoStockSeleccionado =
-        widget.item.estadoStock ?? EstadoStock.disponible;
+    estadoStockSeleccionado = widget.item.estadoStock ?? EstadoStock.disponible;
     imagenPath = widget.item.imagenReferencial;
   }
 
@@ -55,6 +58,7 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
     codigoController.dispose();
     stockInicialController.dispose();
     stockActualController.dispose();
+    unidadController.dispose();
     super.dispose();
   }
 
@@ -112,12 +116,18 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                       children: [
                         Text(
                           'Código',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
                         ),
                         SizedBox(height: 4),
                         Text(
                           codigoController.text,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -225,6 +235,14 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                   return null;
                 },
               ),
+              SizedBox(height: 12),
+              TextFormField(
+                controller: unidadController,
+                decoration: InputDecoration(
+                  labelText: 'Unidad',
+                  border: OutlineInputBorder(),
+                ),
+              ),
             ],
           ),
         ),
@@ -245,6 +263,7 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                 tipo: tipoSeleccionado,
                 stockInicial: stockInicial,
                 stockActual: stockActual,
+                unidad: unidadController.text,
                 estadoProducto: tipoSeleccionado == 'Producto'
                     ? estadoProductoSeleccionado
                     : null,

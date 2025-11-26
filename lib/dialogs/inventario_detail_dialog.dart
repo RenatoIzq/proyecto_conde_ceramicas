@@ -46,10 +46,29 @@ class InventarioDetailDialog extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(color: Colors.grey),
                       ),
-                      child: Image.file(
-                        File(item.imagenReferencial!),
-                        fit: BoxFit.cover,
-                      ),
+                      child: item.imagenReferencial!.startsWith('http')
+                          ? Image.network(
+                              item.imagenReferencial!,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey,
+                                  size: 80,
+                                );
+                              },
+                            )
+                          : Image.file(
+                              File(item.imagenReferencial!),
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.broken_image,
+                                  color: Colors.grey,
+                                  size: 80,
+                                );
+                              },
+                            ),
                     )
                   else
                     Container(
@@ -230,7 +249,10 @@ class InventarioDetailDialog extends StatelessWidget {
                               children: [
                                 Text(
                                   'Inicial',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                                 Text(
                                   '${item.stockInicial}',
@@ -246,7 +268,10 @@ class InventarioDetailDialog extends StatelessWidget {
                               children: [
                                 Text(
                                   'Actual',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                                 Text(
                                   '${item.stockActual}',
@@ -262,7 +287,10 @@ class InventarioDetailDialog extends StatelessWidget {
                               children: [
                                 Text(
                                   'Unidad',
-                                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
                                 ),
                                 Text(
                                   item.unidad,

@@ -91,7 +91,7 @@ class BienvenidaPage extends StatelessWidget {
                           },
                         ),
                         MenuButton(
-                          title: 'Horandas',
+                          title: 'Hornadas',
                           icon: Icons.fireplace,
                           onTap: () {
                             Navigator.push(

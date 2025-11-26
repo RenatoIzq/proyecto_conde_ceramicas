@@ -126,4 +126,44 @@ class InventarioItem {
     }
     return 'Sin estado';
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'nombre': nombre,
+      'codigo': codigo,
+      'tipo': tipo,
+      'stockInicial': stockInicial,
+      'stockActual': stockActual,
+      'unidad': unidad,
+      'estadoProducto': estadoProducto?.name,
+      'estadoStock': estadoStock?.name,
+      'imagenReferencial': imagenReferencial,
+    };
+  }
+
+  factory InventarioItem.fromMap(Map<String, dynamic> map) {
+    return InventarioItem(
+      id: map['id'] ?? '',
+      nombre: map['nombre'] ?? '',
+      codigo: map['codigo'] ?? '',
+      tipo: map['tipo'] ?? '',
+      stockInicial: map['stockInicial']?.toInt() ?? 0,
+      stockActual: map['stockActual']?.toInt() ?? 0,
+      unidad: map['unidad'] ?? '',
+      estadoProducto: map['estadoProducto'] != null
+          ? EstadoProducto.values.firstWhere(
+              (e) => e.name == map['estadoProducto'],
+              orElse: () => EstadoProducto.crudo, // Default fallback
+            )
+          : null,
+      estadoStock: map['estadoStock'] != null
+          ? EstadoStock.values.firstWhere(
+              (e) => e.name == map['estadoStock'],
+              orElse: () => EstadoStock.disponible, // Default fallback
+            )
+          : null,
+      imagenReferencial: map['imagenReferencial'],
+    );
+  }
 }
