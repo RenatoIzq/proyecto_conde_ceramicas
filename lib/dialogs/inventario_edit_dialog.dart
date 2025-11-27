@@ -25,10 +25,11 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
   late TextEditingController codigoController;
   late TextEditingController stockInicialController;
   late TextEditingController stockActualController;
+  late TextEditingController unidadController;
 
   late String tipoSeleccionado;
-  late EstadoProducto estadoProductoSeleccionado; 
-  late EstadoStock estadoStockSeleccionado; 
+  late EstadoProducto estadoProductoSeleccionado;
+  late EstadoStock estadoStockSeleccionado;
   String? imagenPath;
   final ImagePicker _imagePicker = ImagePicker();
 
@@ -37,15 +38,17 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
     super.initState();
     nombreController = TextEditingController(text: widget.item.nombre);
     codigoController = TextEditingController(text: widget.item.codigo);
-    stockInicialController =
-        TextEditingController(text: widget.item.stockInicial.toString());
-    stockActualController =
-        TextEditingController(text: widget.item.stockActual.toString());
+    stockInicialController = TextEditingController(
+      text: widget.item.stockInicial.toString(),
+    );
+    stockActualController = TextEditingController(
+      text: widget.item.stockActual.toString(),
+    );
+    unidadController = TextEditingController(text: widget.item.unidad);
     tipoSeleccionado = widget.item.tipo;
     estadoProductoSeleccionado =
         widget.item.estadoProducto ?? EstadoProducto.crudo;
-    estadoStockSeleccionado =
-        widget.item.estadoStock ?? EstadoStock.disponible;
+    estadoStockSeleccionado = widget.item.estadoStock ?? EstadoStock.disponible;
     imagenPath = widget.item.imagenReferencial;
   }
 
@@ -55,6 +58,7 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
     codigoController.dispose();
     stockInicialController.dispose();
     stockActualController.dispose();
+    unidadController.dispose();
     super.dispose();
   }
 
@@ -112,12 +116,18 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                       children: [
                         Text(
                           'Código',
-                          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
+                          ),
                         ),
                         SizedBox(height: 4),
                         Text(
                           codigoController.text,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ],
                     ),
@@ -225,6 +235,52 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                   return null;
                 },
               ),
+              SizedBox(height: 12),
+              // Campo de unidad solo para Materia Prima y Esmalte
+              if (tipoSeleccionado == 'Materia Prima' ||
+                  tipoSeleccionado == 'Esmalte')
+                TextFormField(
+                  controller: unidadController,
+                  decoration: InputDecoration(
+                    labelText: 'Unidad (kg, L, g, ml) *',
+                    hintText: 'Ej: kg, L, g',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => (value?.isEmpty ?? true)
+                      ? 'Requerido para materias primas y esmaltes'
+                      : null,
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 20,
+                          color: Colors.blue[700],
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Se contabiliza por unidades',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue[900],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -245,6 +301,11 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                 tipo: tipoSeleccionado,
                 stockInicial: stockInicial,
                 stockActual: stockActual,
+                unidad:
+                    (tipoSeleccionado == 'Materia Prima' ||
+                        tipoSeleccionado == 'Esmalte')
+                    ? unidadController.text
+                    : null,
                 estadoProducto: tipoSeleccionado == 'Producto'
                     ? estadoProductoSeleccionado
                     : null,

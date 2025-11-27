@@ -20,6 +20,18 @@ class RecetaMateriaPrima {
       proporcion: proporcion ?? this.proporcion,
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {'id': id, 'nombre': nombre, 'proporcion': proporcion};
+  }
+
+  factory RecetaMateriaPrima.fromMap(Map<String, dynamic> map) {
+    return RecetaMateriaPrima(
+      id: map['id'] ?? '',
+      nombre: map['nombre'] ?? '',
+      proporcion: (map['proporcion'] ?? 0).toDouble(),
+    );
+  }
 }
 
 class Receta {
@@ -34,7 +46,7 @@ class Receta {
     required this.nombre,
     required this.descripcion,
     required this.materiaPrima,
-    this.imagenReferencial
+    this.imagenReferencial,
   });
 
   Receta copyWith({
@@ -50,6 +62,30 @@ class Receta {
       descripcion: descripcion ?? this.descripcion,
       materiaPrima: materiaPrima ?? this.materiaPrima,
       imagenReferencial: imagenReferencial ?? this.imagenReferencial,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'nombre': nombre,
+      'descripcion': descripcion,
+      'materiaPrima': materiaPrima.map((x) => x.toMap()).toList(),
+      'imagenReferencial': imagenReferencial,
+    };
+  }
+
+  factory Receta.fromMap(Map<String, dynamic> map) {
+    return Receta(
+      id: map['id'] ?? '',
+      nombre: map['nombre'] ?? '',
+      descripcion: map['descripcion'] ?? '',
+      materiaPrima: List<RecetaMateriaPrima>.from(
+        (map['materiaPrima'] as List<dynamic>? ?? []).map<RecetaMateriaPrima>(
+          (x) => RecetaMateriaPrima.fromMap(x as Map<String, dynamic>),
+        ),
+      ),
+      imagenReferencial: map['imagenReferencial'],
     );
   }
 }

@@ -6,7 +6,6 @@ import 'package:proyecto_conde_ceramicas/model/inventario_model.dart';
 class InventarioAddDialog extends StatefulWidget {
   final List<String> categorias;
   final Function(InventarioItem) onGuardar;
-  
 
   const InventarioAddDialog({
     super.key,
@@ -19,11 +18,12 @@ class InventarioAddDialog extends StatefulWidget {
 }
 
 class _InventarioAddDialogState extends State<InventarioAddDialog> {
-  final _formKey = GlobalKey<FormState>(); 
-  final nombreController = TextEditingController();  
-  final codigoController = TextEditingController();  
-  final stockInicialController = TextEditingController();  
+  final _formKey = GlobalKey<FormState>();
+  final nombreController = TextEditingController();
+  final codigoController = TextEditingController();
+  final stockInicialController = TextEditingController();
   final stockActualController = TextEditingController();
+  final unidadController = TextEditingController();
 
   late String tipoSeleccionado;
   EstadoProducto estadoProductoSeleccionado = EstadoProducto.crudo;
@@ -43,8 +43,10 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
     codigoController.dispose();
     stockInicialController.dispose();
     stockActualController.dispose();
+    unidadController.dispose();
     super.dispose();
   }
+
   Future<void> _seleccionarImagen() async {
     final XFile? imagen = await _imagePicker.pickImage(
       source: ImageSource.gallery,
@@ -91,7 +93,8 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
                   labelText: 'Código *',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => (value?.isEmpty ?? true) ? 'Requerido' : null,
+                validator: (value) =>
+                    (value?.isEmpty ?? true) ? 'Requerido' : null,
               ),
               SizedBox(height: 12),
               TextFormField(
@@ -100,7 +103,8 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
                   labelText: 'Nombre *',
                   border: OutlineInputBorder(),
                 ),
-                validator: (value) => (value?.isEmpty ?? true) ? 'Requerido' : null,
+                validator: (value) =>
+                    (value?.isEmpty ?? true) ? 'Requerido' : null,
               ),
               SizedBox(height: 12),
               DropdownButtonFormField<String>(
@@ -144,7 +148,8 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
                     return DropdownMenuItem(value: estado, child: Text(texto));
                   }).toList(),
                   onChanged: (value) {
-                    if (value != null) setState(() => estadoProductoSeleccionado = value);
+                    if (value != null)
+                      setState(() => estadoProductoSeleccionado = value);
                   },
                 )
               else
@@ -187,6 +192,43 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
                   return null;
                 },
               ),
+              SizedBox(height: 12),
+              // Campo de unidad solo para Materia Prima y Esmalte
+              if (tipoSeleccionado == 'Materia Prima' || tipoSeleccionado == 'Esmalte')
+                TextFormField(
+                  controller: unidadController,
+                  decoration: InputDecoration(
+                    labelText: 'Unidad (kg, L, g, ml) *',
+                    hintText: 'Ej: kg, L, g',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) =>
+                      (value?.isEmpty ?? true) ? 'Requerido para materias primas y esmaltes' : null,
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(Icons.info_outline, size: 20, color: Colors.blue[700]),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Se contabiliza por unidades',
+                            style: TextStyle(fontSize: 12, color: Colors.blue[900]),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
             ],
           ),
         ),
@@ -203,13 +245,15 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
               final stockActual = int.parse(stockActualController.text);
 
               final item = InventarioItem(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                id: '', // Dejar vacío para que Supabase genere el ID
                 nombre: nombreController.text,
                 codigo: codigoController.text,
                 tipo: tipoSeleccionado,
                 stockInicial: stockInicial,
                 stockActual: stockActual,
-                unidad: 'piezas',
+                unidad: (tipoSeleccionado == 'Materia Prima' || tipoSeleccionado == 'Esmalte')
+                    ? unidadController.text
+                    : null,
                 // ✅ Asigna los estados correctamente
                 estadoProducto: tipoSeleccionado == 'Producto'
                     ? estadoProductoSeleccionado
@@ -221,7 +265,6 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
                       )
                     : null,
                 imagenReferencial: imagenPath,
-
               );
               widget.onGuardar(item);
               Navigator.pop(context);
