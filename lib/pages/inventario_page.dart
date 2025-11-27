@@ -366,7 +366,9 @@ class _InventarioPageState extends State<InventarioPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Código: ${item.codigo}'),
-                                Text('${item.stockActual} ${item.unidad}'),
+                                Text(
+                                  '${item.stockActual}${item.unidad != null ? " ${item.unidad}" : " unidades"}',
+                                ),
                                 Chip(
                                   label: Text(
                                     item.getEstadoTexto(),
