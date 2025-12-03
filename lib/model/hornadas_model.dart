@@ -45,35 +45,35 @@ class Hornada {
     return '1200C° - 1300C°';
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'id': id,
-      'fechaPlanificada': fechaPlanificada.toIso8601String(),
-      'horaInicio': horaInicio?.toIso8601String(),
-      'horaInicioReal': horaInicioReal?.toIso8601String(),
-      'horaFin': horaFin?.toIso8601String(),
-      'perfilTemperatura': perfilTemperatura,
+      'fecha_planificada': fechaPlanificada.toIso8601String(),
+      'hora_inicio': horaInicio?.toIso8601String(),
+      'hora_inicio_real': horaInicioReal?.toIso8601String(),
+      'hora_fin': horaFin?.toIso8601String(),
+      'perfil_temperatura': perfilTemperatura,
       'estado': estado,
       'horno': horno,
       'observaciones': observaciones,
     };
   }
 
-  factory Hornada.fromJson(Map<String, dynamic> json) {
+  factory Hornada.fromMap(Map<String, dynamic> map) {
     return Hornada(
-      id: json['id'],
-      fechaPlanificada: DateTime.parse(json['fechaPlanificada']),
-      horaInicio: json['horaInicio'] != null
-          ? DateTime.parse(json['horaInicio'])
+      id: map['id'] ?? '',
+      fechaPlanificada: DateTime.parse(map['fecha_planificada']),
+      horaInicio: map['hora_inicio'] != null
+          ? DateTime.parse(map['hora_inicio'])
           : null,
-      horaInicioReal: json['horaInicioReal'] != null
-          ? DateTime.parse(json['horaInicioReal'])
+      horaInicioReal: map['hora_inicio_real'] != null
+          ? DateTime.parse(map['hora_inicio_real'])
           : null,
-      horaFin: json['horaFin'] != null ? DateTime.parse(json['horaFin']) : null,
-      perfilTemperatura: json['perfilTemperatura'],
-      estado: json['estado'],
-      horno: json['horno'],
-      observaciones: json['observaciones'],
+      horaFin: map['hora_fin'] != null ? DateTime.parse(map['hora_fin']) : null,
+      perfilTemperatura: map['perfil_temperatura'] ?? '',
+      estado: map['estado'] ?? '',
+      horno: map['horno'],
+      observaciones: map['observaciones'],
     );
   }
 }

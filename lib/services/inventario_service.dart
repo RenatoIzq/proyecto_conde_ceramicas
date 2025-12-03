@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:proyecto_conde_ceramicas/model/inventario_model.dart';
 
@@ -16,9 +17,7 @@ class InventarioService {
       await _client.storage.from(_bucketName).upload(fileName, file);
       return _client.storage.from(_bucketName).getPublicUrl(fileName);
     } catch (e) {
-      print('Error uploading image: $e');
-      // If upload fails, we might want to throw or return null.
-      // For now returning null means we won't save the image URL.
+      debugPrint('Error uploading image: $e');
       return null;
     }
   }
@@ -27,7 +26,6 @@ class InventarioService {
   Future<void> addInventarioItem(InventarioItem item) async {
     String? imageUrl = item.imagenReferencial;
 
-    // If there is an image path and it's a local file (not a URL), upload it
     if (imageUrl != null &&
         imageUrl.isNotEmpty &&
         !imageUrl.startsWith('http')) {
@@ -58,7 +56,6 @@ class InventarioService {
   Future<void> updateInventarioItem(InventarioItem item) async {
     String? imageUrl = item.imagenReferencial;
 
-    // If there is an image path and it's a local file (not a URL), upload it
     if (imageUrl != null &&
         imageUrl.isNotEmpty &&
         !imageUrl.startsWith('http')) {
@@ -88,14 +85,12 @@ class InventarioService {
       if (item.imagenReferencial != null &&
           item.imagenReferencial!.isNotEmpty) {
         final imageUrl = item.imagenReferencial!;
-        // Decode the filename to handle spaces and special characters (e.g. %20 -> space)
         final fileName = Uri.decodeComponent(imageUrl.split('/').last);
 
         await _client.storage.from(_bucketName).remove([fileName]);
       }
     } catch (e) {
-      print('Error deleting image: $e');
-      // Continue to delete item even if image deletion fails
+      debugPrint('Error deleting image: $e');
     }
 
     // 3. Delete item from DB

@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 
 import 'package:proyecto_conde_ceramicas/model/hornadas_model.dart';
+import 'package:proyecto_conde_ceramicas/services/hornada_service.dart';
 import 'package:proyecto_conde_ceramicas/components/hornada_legend.dart';
 import 'package:proyecto_conde_ceramicas/components/hornadas_calendar.dart';
 import 'package:proyecto_conde_ceramicas/components/hornada_planning_section.dart';
@@ -18,66 +19,32 @@ class HornadasPage extends StatefulWidget {
 }
 
 class _HornadasPageState extends State<HornadasPage> {
+  final HornadaService _hornadaService = HornadaService();
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  final Map<DateTime, List<Hornada>> _hornadas = {};
 
   @override
   void initState() {
     super.initState();
-    _cargarDatosDePrueba();
+    _selectedDay = _normalizarFecha(DateTime.now());
   }
 
   DateTime _normalizarFecha(DateTime fecha) {
     return DateTime(fecha.year, fecha.month, fecha.day);
   }
 
-  // Cargar datos de prueba (simulando base de datos)
-  void _cargarDatosDePrueba() {
-    // Puedes agregar algunos datos de ejemplo aquí
-    final hoy = DateTime.now();
-    final manana = hoy.add(Duration(days: 1));
-    final pasado = hoy.subtract(Duration(days: 3));
-
-    // Ejemplo de hornada planificada
-    final hornadaPlanificada = Hornada(
-      id: '1',
-      fechaPlanificada: manana,
-      horaInicio: DateTime(manana.year, manana.month, manana.day, 8, 0),
-      perfilTemperatura: 'Bizcocho',
-      estado: 'Planificado',
-      horno: 'Horno 1',
-      observaciones: 'Quema de prueba',
-    );
-
-    // Ejemplo de hornada en curso
-    final hornadaEnCurso = Hornada(
-      id: '2',
-      fechaPlanificada: hoy,
-      horaInicio: DateTime(hoy.year, hoy.month, hoy.day, 7, 0),
-      horaInicioReal: DateTime(hoy.year, hoy.month, hoy.day, 7, 15),
-      perfilTemperatura: 'Esmalte',
-      estado: 'En Curso',
-      horno: 'Horno 2',
-    );
-
-    // Ejemplo de hornada finalizada
-    final hornadaFinalizada = Hornada(
-      id: '3',
-      fechaPlanificada: pasado,
-      horaInicio: DateTime(pasado.year, pasado.month, pasado.day, 8, 0),
-      horaInicioReal: DateTime(pasado.year, pasado.month, pasado.day, 8, 10),
-      horaFin: DateTime(pasado.year, pasado.month, pasado.day, 16, 30),
-      perfilTemperatura: 'Bizcocho',
-      estado: 'Finalizado',
-      horno: 'Horno 1',
-    );
-
-    setState(() {
-      _hornadas[_normalizarFecha(manana)] = [hornadaPlanificada];
-      _hornadas[_normalizarFecha(hoy)] = [hornadaEnCurso];
-      _hornadas[_normalizarFecha(pasado)] = [hornadaFinalizada];
-    });
+  Map<DateTime, List<Hornada>> _agruparHornadasPorFecha(
+    List<Hornada> hornadas,
+  ) {
+    final Map<DateTime, List<Hornada>> map = {};
+    for (var hornada in hornadas) {
+      final fecha = _normalizarFecha(hornada.fechaPlanificada);
+      if (map[fecha] == null) {
+        map[fecha] = [];
+      }
+      map[fecha]!.add(hornada);
+    }
+    return map;
   }
 
   @override
@@ -115,50 +82,67 @@ class _HornadasPageState extends State<HornadasPage> {
             colors: [Colors.white, Colors.black],
           ),
         ),
-        child: Padding(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            children: [
-              CalendarioHornada(
-                focusedDay: _focusedDay,
-                selectedDay: _selectedDay,
-                hornadas: _hornadas,
-                onDaySelected: (selectedDay, focusedDay) {
-                  setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                  _manejarSeleccionDia(selectedDay);
-                },
+        child: StreamBuilder<List<Hornada>>(
+          stream: _hornadaService.getHornadas(),
+          builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            }
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+
+            final hornadasList = snapshot.data ?? [];
+            final hornadasMap = _agruparHornadasPorFecha(hornadasList);
+
+            return Padding(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  CalendarioHornada(
+                    focusedDay: _focusedDay,
+                    selectedDay: _selectedDay,
+                    hornadas: hornadasMap,
+                    onDaySelected: (selectedDay, focusedDay) {
+                      setState(() {
+                        _selectedDay = selectedDay;
+                        _focusedDay = focusedDay;
+                      });
+                      _manejarSeleccionDia(selectedDay, hornadasMap);
+                    },
+                  ),
+                  SizedBox(height: 1),
+                  const HornadaLegend(),
+                  SizedBox(height: 1),
+                  Expanded(
+                    child: ListaPlanificaciones(
+                      hornadas: hornadasMap,
+                      onHornadaTap: (hornada) {
+                        setState(() => _selectedDay = hornada.fechaPlanificada);
+                      },
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 1),
-              const HornadaLegend(),
-              SizedBox(height: 1),
-              Expanded(
-                child: ListaPlanificaciones(
-                  hornadas: _hornadas,
-                  onHornadaTap: (hornada) {
-                    // Opcional: manejar tap en item de lista
-                    setState(() => _selectedDay = hornada.fechaPlanificada);
-                  },
-                ),
-              ),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
 
-  void _manejarSeleccionDia(DateTime dia) {
+  void _manejarSeleccionDia(
+    DateTime dia,
+    Map<DateTime, List<Hornada>> hornadasMap,
+  ) {
     final key = _normalizarFecha(dia);
-    final hornadasDelDia = _hornadas[key];
+    final hornadasDelDia = hornadasMap[key];
 
     if (hornadasDelDia == null || hornadasDelDia.isEmpty) {
       // Día SIN pintar: mostrar diálogo de planificación
       showDialog(
         context: context,
-        builder: (context) => PlanifierDialog(
+        builder: (_) => PlanifierDialog(
           fechaSeleccionada: dia,
           onPlanificar: _agregarHornada,
         ),
@@ -170,7 +154,7 @@ class _HornadasPageState extends State<HornadasPage> {
         // Día CON planificación: mostrar diálogo de registro
         showDialog(
           context: context,
-          builder: (context) => RegisterDialog(
+          builder: (_) => RegisterDialog(
             hornada: hornada,
             onRegistrar: _actualizarHornada,
             onEliminar: _eliminarHornada,
@@ -180,7 +164,7 @@ class _HornadasPageState extends State<HornadasPage> {
         // Día EN CURSO: mostrar diálogo para finalizar
         showDialog(
           context: context,
-          builder: (context) => FinalizerDialog(
+          builder: (_) => FinalizerDialog(
             hornada: hornada,
             onFinalizar: _actualizarHornada,
           ),
@@ -237,55 +221,73 @@ class _HornadasPageState extends State<HornadasPage> {
     );
   }
 
-  void _agregarHornada(Hornada hornada) {
-    setState(() {
-      final key = _normalizarFecha(hornada.fechaPlanificada);
-      _hornadas[key] = [hornada];
-    });
-
-    // Mostrar confirmación
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Hornada planificada correctamente'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
+  Future<void> _agregarHornada(Hornada hornada) async {
+    try {
+      await _hornadaService.addHornada(hornada);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Hornada planificada correctamente'),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al planificar hornada: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-  void _actualizarHornada(Hornada hornada) {
-    setState(() {
-      final key = _normalizarFecha(hornada.fechaPlanificada);
-      _hornadas[key] = [hornada];
-    });
+  Future<void> _actualizarHornada(Hornada hornada) async {
+    try {
+      await _hornadaService.updateHornada(hornada);
+      if (!mounted) return;
+      String mensaje = hornada.estado == 'En Curso'
+          ? 'Quema iniciada correctamente'
+          : 'Quema finalizada correctamente';
 
-    // Mostrar confirmación
-    String mensaje = hornada.estado == 'En Curso'
-        ? 'Quema iniciada correctamente'
-        : 'Quema finalizada correctamente';
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(mensaje),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(mensaje),
+          backgroundColor: Colors.green,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al actualizar hornada: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
-  void _eliminarHornada(Hornada hornada) {
-    setState(() {
-      final key = _normalizarFecha(hornada.fechaPlanificada);
-      _hornadas.remove(key);
-    });
-
-    // Mostrar confirmación
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Planificación eliminada'),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 2),
-      ),
-    );
+  Future<void> _eliminarHornada(Hornada hornada) async {
+    try {
+      await _hornadaService.deleteHornada(hornada.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Planificación eliminada'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error al eliminar hornada: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 }

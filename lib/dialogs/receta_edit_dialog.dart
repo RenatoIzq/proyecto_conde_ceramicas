@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:proyecto_conde_ceramicas/model/receta_model.dart';
+import 'package:proyecto_conde_ceramicas/model/inventario_model.dart';
+import 'package:proyecto_conde_ceramicas/services/inventario_service.dart';
+import 'package:image_picker/image_picker.dart';
 
 class RecetaEditDialog extends StatefulWidget {
   final Receta receta;
@@ -23,17 +25,30 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
   late TextEditingController nombreController;
   late TextEditingController descripcionController;
   late List<RecetaMateriaPrima> materiaPrima;
-
   String? imagenPath;
-  final ImagePicker _imagePicker = ImagePicker();
+  List<InventarioItem> _inventarioItems = [];
+  final InventarioService _inventarioService = InventarioService();
 
   @override
   void initState() {
     super.initState();
     nombreController = TextEditingController(text: widget.receta.nombre);
-    descripcionController = TextEditingController(text: widget.receta.descripcion);
+    descripcionController = TextEditingController(
+      text: widget.receta.descripcion,
+    );
     materiaPrima = List.from(widget.receta.materiaPrima);
     imagenPath = widget.receta.imagenReferencial;
+    _loadInventario();
+  }
+
+  Future<void> _loadInventario() async {
+    _inventarioService.getInventario().listen((items) {
+      if (mounted) {
+        setState(() {
+          _inventarioItems = items;
+        });
+      }
+    });
   }
 
   @override
@@ -42,6 +57,20 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
     descripcionController.dispose();
     super.dispose();
   }
+
+  void _agregarMateriaPrima() {
+    setState(() {
+      materiaPrima.add(
+        RecetaMateriaPrima(inventarioId: '', nombre: '', proporcion: 0),
+      );
+    });
+  }
+
+  void _eliminarMateriaPrima(int index) {
+    setState(() => materiaPrima.removeAt(index));
+  }
+
+  final ImagePicker _imagePicker = ImagePicker();
 
   Future<void> _seleccionarImagen() async {
     final XFile? imagen = await _imagePicker.pickImage(
@@ -52,22 +81,6 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
     if (imagen != null) {
       setState(() => imagenPath = imagen.path);
     }
-  }
-
-  void _agregarMateriaPrima() {
-    setState(() {
-      materiaPrima.add(
-        RecetaMateriaPrima(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          nombre: '',
-          proporcion: 0,
-        ),
-      );
-    });
-  }
-
-  void _eliminarMateriaPrima(int index) {
-    setState(() => materiaPrima.removeAt(index));
   }
 
   @override
@@ -81,7 +94,7 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                height: 150,
+                height: 120,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -91,10 +104,24 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
                 child: imagenPath != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(8),
-                        child: Image.file(
-                          File(imagenPath!),
-                          fit: BoxFit.cover,
-                        ),
+                        child: (imagenPath!.startsWith('http'))
+                            ? Image.network(
+                                imagenPath!,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) =>
+                                    Icon(Icons.broken_image, size: 50),
+                              )
+                            : Image.file(
+                                File(imagenPath!),
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Icon(
+                                    Icons.broken_image,
+                                    size: 50,
+                                    color: Colors.grey,
+                                  );
+                                },
+                              ),
                       )
                     : Icon(Icons.image, size: 50, color: Colors.grey),
               ),
@@ -108,78 +135,108 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
                   foregroundColor: Colors.white,
                 ),
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 8),
               TextFormField(
                 controller: nombreController,
                 decoration: InputDecoration(
-                  labelText: 'Nombre Receta',
+                  labelText: 'Nombre Receta *',
                   border: OutlineInputBorder(),
                 ),
+                validator: (value) =>
+                    (value?.isEmpty ?? true) ? 'Requerido' : null,
               ),
               SizedBox(height: 12),
               TextFormField(
                 controller: descripcionController,
                 decoration: InputDecoration(
-                  labelText: 'Descripción',
+                  labelText: 'Descripción *',
                   border: OutlineInputBorder(),
                 ),
                 maxLines: 3,
+                validator: (value) =>
+                    (value?.isEmpty ?? true) ? 'Requerido' : null,
               ),
-              SizedBox(height: 16),
+              SizedBox(height: 12),
               Text(
                 'Materias Primas',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 8),
-              ...List.generate(
-                materiaPrima.length,
-                (index) {
-                  final mp = materiaPrima[index];
-                  return Padding(
-                    padding: EdgeInsets.only(bottom: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: TextFormField(
-                            initialValue: mp.nombre,
-                            decoration: InputDecoration(
-                              labelText: 'Nombre',
-                              border: OutlineInputBorder(),
-                              isDense: true,
-                            ),
-                            onChanged: (value) {
-                              materiaPrima[index] = mp.copyWith(nombre: value);
-                            },
+              ...List.generate(materiaPrima.length, (index) {
+                final mp = materiaPrima[index];
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: DropdownButtonFormField<String>(
+                          initialValue:
+                              mp.inventarioId.isNotEmpty &&
+                                  _inventarioItems.any(
+                                    (e) => e.id == mp.inventarioId,
+                                  )
+                              ? mp.inventarioId
+                              : null,
+                          decoration: InputDecoration(
+                            labelText: 'Materia Prima',
+                            border: OutlineInputBorder(),
+                            isDense: true,
                           ),
-                        ),
-                        SizedBox(width: 8),
-                        SizedBox(
-                          width: 80,
-                          child: TextFormField(
-                            initialValue: mp.proporcion.toString(),
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              labelText: '%',
-                              border: OutlineInputBorder(),
-                              isDense: true,
-                            ),
-                            onChanged: (value) {
-                              materiaPrima[index] = mp.copyWith(
-                                proporcion: double.tryParse(value) ?? 0,
+                          items: _inventarioItems.map((item) {
+                            return DropdownMenuItem(
+                              value: item.id,
+                              child: Text(item.nombre),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value != null) {
+                              final selectedItem = _inventarioItems.firstWhere(
+                                (e) => e.id == value,
                               );
-                            },
+                              setState(() {
+                                materiaPrima[index] = mp.copyWith(
+                                  inventarioId: value,
+                                  nombre: selectedItem.nombre,
+                                );
+                              });
+                            }
+                          },
+                          validator: (value) =>
+                              value == null ? 'Requerido' : null,
+                        ),
+                      ),
+                      SizedBox(width:2),
+                      SizedBox(
+                        width: 70,
+                        child: TextFormField(
+                          initialValue: mp.proporcion > 0
+                              ? mp.proporcion.toString()
+                              : '',
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            labelText: 'Proporción',
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                            suffixText: '%',
                           ),
+                          onChanged: (value) {
+                            materiaPrima[index] = mp.copyWith(
+                              proporcion: double.tryParse(value) ?? 0,
+                            );
+                          },
+                          validator: (value) =>
+                              (value?.isEmpty ?? true) ? 'Req' : null,
                         ),
-                        SizedBox(width: 8),
-                        IconButton(
-                          icon: Icon(Icons.delete, color: Colors.red),
-                          onPressed: () => _eliminarMateriaPrima(index),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
+                      ),
+                      SizedBox(width: 8),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red),
+                        onPressed: () => _eliminarMateriaPrima(index),
+                      ),
+                    ],
+                  ),
+                );
+              }),
               ElevatedButton.icon(
                 onPressed: _agregarMateriaPrima,
                 icon: Icon(Icons.add),
@@ -197,16 +254,8 @@ class _RecetaEditDialogState extends State<RecetaEditDialog> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              if (materiaPrima.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Añade al menos una materia prima'),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-                return;
-              }
-              final recetaActualizada = widget.receta.copyWith(
+              final recetaActualizada = Receta(
+                id: widget.receta.id,
                 nombre: nombreController.text,
                 descripcion: descripcionController.text,
                 materiaPrima: materiaPrima,

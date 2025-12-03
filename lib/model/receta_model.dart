@@ -1,34 +1,53 @@
 class RecetaMateriaPrima {
-  final String id;
-  final String nombre;
+  final String? id;
+  final String inventarioId;
+  final String nombre; // For display purposes, fetched from Inventario
   final double proporcion;
 
   RecetaMateriaPrima({
-    required this.id,
+    this.id,
+    required this.inventarioId,
     required this.nombre,
     required this.proporcion,
   });
 
   RecetaMateriaPrima copyWith({
     String? id,
+    String? inventarioId,
     String? nombre,
     double? proporcion,
   }) {
     return RecetaMateriaPrima(
       id: id ?? this.id,
+      inventarioId: inventarioId ?? this.inventarioId,
       nombre: nombre ?? this.nombre,
       proporcion: proporcion ?? this.proporcion,
     );
   }
 
   Map<String, dynamic> toMap() {
-    return {'id': id, 'nombre': nombre, 'proporcion': proporcion};
+    return {
+      // 'id': id, // Usually we don't send ID on create, handled by DB or parent
+      'inventario_id': inventarioId,
+      'proporcion': proporcion,
+    };
   }
 
   factory RecetaMateriaPrima.fromMap(Map<String, dynamic> map) {
+    // Handle the nested join structure from Supabase
+    // map might look like: { 'proporcion': 10, 'inventario': { 'nombre': 'Arcilla' }, 'inventario_id': '...' }
+
+    String nombre = '';
+    if (map['inventario'] != null && map['inventario'] is Map) {
+      nombre = map['inventario']['nombre'] ?? '';
+    } else if (map['nombre'] != null) {
+      nombre = map['nombre'];
+    }
+
     return RecetaMateriaPrima(
-      id: map['id'] ?? '',
-      nombre: map['nombre'] ?? '',
+      id: map['id']?.toString(),
+      inventarioId: map['inventario_id'] ?? '',
+      nombre: nombre,
       proporcion: (map['proporcion'] ?? 0).toDouble(),
     );
   }
@@ -67,11 +86,10 @@ class Receta {
 
   Map<String, dynamic> toMap() {
     return {
-      'id': id,
       'nombre': nombre,
       'descripcion': descripcion,
-      'materiaPrima': materiaPrima.map((x) => x.toMap()).toList(),
-      'imagenReferencial': imagenReferencial,
+      'imagen_referencial': imagenReferencial,
+      // materiaPrima is handled separately in the service for Many-to-Many inserts
     };
   }
 
@@ -81,11 +99,12 @@ class Receta {
       nombre: map['nombre'] ?? '',
       descripcion: map['descripcion'] ?? '',
       materiaPrima: List<RecetaMateriaPrima>.from(
-        (map['materiaPrima'] as List<dynamic>? ?? []).map<RecetaMateriaPrima>(
-          (x) => RecetaMateriaPrima.fromMap(x as Map<String, dynamic>),
-        ),
+        (map['receta_materia_prima'] as List<dynamic>? ?? [])
+            .map<RecetaMateriaPrima>(
+              (x) => RecetaMateriaPrima.fromMap(x as Map<String, dynamic>),
+            ),
       ),
-      imagenReferencial: map['imagenReferencial'],
+      imagenReferencial: map['imagen_referencial'], // Note snake_case from DB
     );
   }
 }

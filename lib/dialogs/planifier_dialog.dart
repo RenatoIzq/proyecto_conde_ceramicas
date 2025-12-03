@@ -151,7 +151,7 @@ class _PlanifierDialogState extends State<PlanifierDialog> {
               );
 
               final nuevaHornada = Hornada(
-                id: DateTime.now().millisecondsSinceEpoch.toString(),
+                id: '',
                 fechaPlanificada: widget.fechaSeleccionada,
                 horaInicio: horaCompleta,
                 perfilTemperatura: perfilSeleccionado,

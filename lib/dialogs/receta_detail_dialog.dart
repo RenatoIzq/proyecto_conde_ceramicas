@@ -55,21 +55,40 @@ class RecetaDetailDialog extends StatelessWidget {
                             width: double.infinity,
                             margin: EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.deepOrange, width: 2),
+                              border: Border.all(
+                                color: Colors.deepOrange,
+                                width: 2,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                File(receta.imagenReferencial!),
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Container(
-                                    color: Colors.grey[200],
-                                    child: Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                                  );
-                                },
-                              ),
+                              child:
+                                  (receta.imagenReferencial!.startsWith('http'))
+                                  ? Image.network(
+                                      receta.imagenReferencial!,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) => Icon(
+                                            Icons.broken_image,
+                                            size: 50,
+                                          ),
+                                    )
+                                  : Image.file(
+                                      File(receta.imagenReferencial!),
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return Container(
+                                              color: Colors.grey[200],
+                                              child: Icon(
+                                                Icons.broken_image,
+                                                size: 50,
+                                                color: Colors.grey,
+                                              ),
+                                            );
+                                          },
+                                    ),
                             ),
                           )
                         else
@@ -78,12 +97,19 @@ class RecetaDetailDialog extends StatelessWidget {
                             width: double.infinity,
                             margin: EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
-                              border: Border.all(color: Colors.deepOrange, width: 2),
+                              border: Border.all(
+                                color: Colors.deepOrange,
+                                width: 2,
+                              ),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: Icon(Icons.palette, size: 80, color: Colors.deepOrange),
-                          ), 
-                        SizedBox(height: 2),    
+                            child: Icon(
+                              Icons.palette,
+                              size: 80,
+                              color: Colors.deepOrange,
+                            ),
+                          ),
+                        SizedBox(height: 2),
                         Text(
                           'Nombre',
                           style: TextStyle(
@@ -126,10 +152,7 @@ class RecetaDetailDialog extends StatelessWidget {
                         SizedBox(height: 8),
                         Text(
                           receta.descripcion,
-                          style: TextStyle(
-                            fontSize: 14,
-                            height: 1.5,
-                          ),
+                          style: TextStyle(fontSize: 14, height: 1.5),
                         ),
                       ],
                     ),
@@ -152,68 +175,68 @@ class RecetaDetailDialog extends StatelessWidget {
                     )
                   else
                     Column(
-                      children: List.generate(
-                        receta.materiaPrima.length,
-                        (index) {
-                          final mp = receta.materiaPrima[index];
-                          return Padding(
-                            padding: EdgeInsets.only(bottom: 12),
-                            child: Container(
-                              padding: EdgeInsets.all(12),
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                border: Border.all(color: Colors.grey[300]!),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          mp.nombre,
-                                          style: TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Text(
-                                          'Proporción: ${mp.proporcion}%',
-                                          style: TextStyle(
-                                            fontSize: 12,
-                                            color: Colors.grey[600],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 6,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.deepOrange,
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      '${mp.proporcion.toStringAsFixed(1)}%',
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
+                      children: List.generate(receta.materiaPrima.length, (
+                        index,
+                      ) {
+                        final mp = receta.materiaPrima[index];
+                        return Padding(
+                          padding: EdgeInsets.only(bottom: 12),
+                          child: Container(
+                            padding: EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                          );
-                        },
-                      ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        mp.nombre,
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        'Proporción: ${mp.proporcion}%',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.deepOrange,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    '${mp.proporcion}%',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
                     ),
                   SizedBox(height: 16),
                   Container(

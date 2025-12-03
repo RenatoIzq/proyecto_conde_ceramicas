@@ -69,7 +69,7 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                height: 150,
+                height: 120,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
@@ -148,8 +148,9 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
                     return DropdownMenuItem(value: estado, child: Text(texto));
                   }).toList(),
                   onChanged: (value) {
-                    if (value != null)
+                    if (value != null) {
                       setState(() => estadoProductoSeleccionado = value);
+                    }
                   },
                 )
               else
@@ -196,7 +197,7 @@ class _InventarioAddDialogState extends State<InventarioAddDialog> {
               TextFormField(
                 controller: unidadController,
                 decoration: InputDecoration(
-                  labelText: 'Unidad (kg, lts, piezas) *',
+                  labelText: 'Unidad (kg, lts u otro) *',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) =>

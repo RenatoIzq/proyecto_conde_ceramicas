@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:proyecto_conde_ceramicas/components/action_button.dart';
 import 'package:proyecto_conde_ceramicas/themes/themes.dart';
 import 'package:proyecto_conde_ceramicas/model/receta_model.dart';
+import 'package:proyecto_conde_ceramicas/services/receta_service.dart';
 import 'package:proyecto_conde_ceramicas/dialogs/receta_add_dialog.dart';
 import 'package:proyecto_conde_ceramicas/dialogs/receta_edit_dialog.dart';
 import 'package:proyecto_conde_ceramicas/dialogs/receta_detail_dialog.dart';
@@ -20,15 +21,21 @@ class RecetasPage extends StatefulWidget {
 class _RecetasPageState extends State<RecetasPage> {
   final TextEditingController searchController = TextEditingController();
   String searchTerm = '';
-  
-  late List<Receta> recetas;
+  final RecetaService _recetaService = RecetaService();
+
+  late Future<List<Receta>> _recetasFuture;
   Receta? recetaSeleccionada;
 
   @override
   void initState() {
     super.initState();
-    recetas = [];
-    _cargarDatosDePrueba();
+    _loadRecetas();
+  }
+
+  void _loadRecetas() {
+    setState(() {
+      _recetasFuture = _recetaService.getRecetas();
+    });
   }
 
   @override
@@ -37,44 +44,10 @@ class _RecetasPageState extends State<RecetasPage> {
     super.dispose();
   }
 
-  void _cargarDatosDePrueba() {
-    recetas = [
-      Receta(
-        id: '1',
-        nombre: 'Esmalte Azul Cobalto',
-        descripcion: 'Esmalte brillante de color azul intenso, ideal para piezas decorativas.',
-        materiaPrima: [
-          RecetaMateriaPrima(id: '1', nombre: 'Feldespato', proporcion: 30),
-          RecetaMateriaPrima(id: '2', nombre: 'Caolín', proporcion: 25),
-          RecetaMateriaPrima(id: '3', nombre: 'Óxido de Cobalto', proporcion: 5),
-        ],
-      ),
-      Receta(
-        id: '2',
-        nombre: 'Esmalte Rojo Oscuro',
-        descripcion: 'Esmalte mate de tonos rojos profundos.',
-        materiaPrima: [
-          RecetaMateriaPrima(id: '4', nombre: 'Feldespato', proporcion: 28),
-          RecetaMateriaPrima(id: '5', nombre: 'Caolín', proporcion: 22),
-          RecetaMateriaPrima(id: '6', nombre: 'Óxido de Hierro', proporcion: 8),
-        ],
-      ),
-      Receta(
-        id: '3',
-        nombre: 'Bizcocho Base',
-        descripcion: 'Esmalte base para hornadas de bizcocho.',
-        materiaPrima: [
-          RecetaMateriaPrima(id: '7', nombre: 'Feldespato', proporcion: 35),
-          RecetaMateriaPrima(id: '8', nombre: 'Caolín', proporcion: 30),
-        ],
-      ),
-    ];
-  }
-
-  List<Receta> _obtenerRecetasFiltradas() {
+  List<Receta> _filtrarRecetas(List<Receta> recetas) {
+    if (searchTerm.isEmpty) return recetas;
     return recetas.where((receta) {
-      return searchTerm.isEmpty ||
-          receta.nombre.toLowerCase().contains(searchTerm.toLowerCase()) ||
+      return receta.nombre.toLowerCase().contains(searchTerm.toLowerCase()) ||
           receta.descripcion.toLowerCase().contains(searchTerm.toLowerCase());
     }).toList();
   }
@@ -82,85 +55,101 @@ class _RecetasPageState extends State<RecetasPage> {
   void _accionAnadir() {
     showDialog(
       context: context,
-      builder: (context) => RecetaAddDialog(
-        onGuardar: (receta) {
-          setState(() {
-            recetas.add(receta);
-            recetaSeleccionada = null;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Receta añadida correctamente'),
-              backgroundColor: Colors.green,
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  void _accionEditar() {
-    if (recetaSeleccionada == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Selecciona una receta para editar'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (context) => RecetaEditDialog(
-        receta: recetaSeleccionada!,
-        onGuardar: (receta) {
-          setState(() {
-            final index = recetas.indexWhere((r) => r.id == recetaSeleccionada!.id);
-            if (index != -1) {
-              recetas[index] = receta;
+      builder: (_) => RecetaAddDialog(
+        onGuardar: (receta) async {
+          try {
+            await _recetaService.addReceta(receta);
+            if (!mounted) {
+              return;
             }
-            recetaSeleccionada = null;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Receta actualizada correctamente'),
-              backgroundColor: Colors.green,
-            ),
-          );
+            _loadRecetas(); // Refresh list
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Receta añadida correctamente'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } catch (e) {
+            if (!mounted) {
+              return;
+            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error al añadir receta: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         },
       ),
     );
   }
 
-  void _accionEliminar() {
-    if (recetaSeleccionada == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Selecciona una receta para eliminar'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-      return;
-    }
-
+  void _accionEditar(Receta receta) {
     showDialog(
       context: context,
-      builder: (context) => DeleteDialog(
+      builder: (_) => RecetaEditDialog(
+        receta: receta,
+        onGuardar: (recetaActualizada) async {
+          try {
+            await _recetaService.updateReceta(recetaActualizada);
+            if (!mounted) {
+              return;
+            }
+            _loadRecetas(); // Refresh list
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Receta actualizada correctamente'),
+                backgroundColor: Colors.green,
+              ),
+            );
+          } catch (e) {
+            if (!mounted) {
+              return;
+            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error al actualizar receta: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        },
+      ),
+    );
+  }
+
+  void _accionEliminar(Receta receta) {
+    showDialog(
+      context: context,
+      builder: (_) => DeleteDialog(
         titulo: 'Eliminar Receta',
         mensaje: '¿Está seguro de eliminar esta receta?',
-        detalles: 'Receta: ${recetaSeleccionada!.nombre}',
-        onConfirmar: () {
-          setState(() {
-            recetas.removeWhere((r) => r.id == recetaSeleccionada!.id);
-            recetaSeleccionada = null;
-          });
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Receta eliminada correctamente'),
-              backgroundColor: Colors.red,
-            ),
-          );
+        detalles: 'Receta: ${receta.nombre}',
+        onConfirmar: () async {
+          try {
+            await _recetaService.deleteReceta(receta.id);
+            if (!mounted) {
+              return;
+            }
+            _loadRecetas(); // Refresh list
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Receta eliminada correctamente'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          } catch (e) {
+            if (!mounted) {
+              return;
+            }
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Error al eliminar receta: $e'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         },
       ),
     );
@@ -168,8 +157,6 @@ class _RecetasPageState extends State<RecetasPage> {
 
   @override
   Widget build(BuildContext context) {
-    final recetasFiltradas = _obtenerRecetasFiltradas();
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: grisoscuro,
@@ -233,99 +220,139 @@ class _RecetasPageState extends State<RecetasPage> {
               ),
               SizedBox(height: 10),
               Expanded(
-                child: recetasFiltradas.isEmpty
-                    ? Center(
+                child: FutureBuilder<List<Receta>>(
+                  future: _recetasFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(
                         child: Text(
                           'No hay recetas disponibles',
                           style: TextStyle(color: Colors.grey, fontSize: 16),
                         ),
-                      )
-                    : ListView.builder(
-                        itemCount: recetasFiltradas.length,
-                        itemBuilder: (context, index) {
-                          final receta = recetasFiltradas[index];
-                          final esSeleccionada = recetaSeleccionada?.id == receta.id;
+                      );
+                    }
 
-                          return Card(
-                            margin: EdgeInsets.symmetric(vertical: 8),
-                            color: esSeleccionada ? Colors.blue[50] : Colors.white,
-                            child: ListTile(
-                              selected: esSeleccionada,
-                              onTap: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) => RecetaDetailDialog(
-                                    receta: receta,
-                                    onEditar: (receta) {
-                                      setState(() => recetaSeleccionada = receta);
-                                      _accionEditar();
-                                    },
-                                    onEliminar: (receta) {
-                                      setState(() => recetaSeleccionada = receta);
-                                      _accionEliminar();
-                                    },
-                                  ),
-                                );
-                              },
-                              leading: Container(
-                                width: 80,
-                                height: 80,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[200],
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(
-                                    color: Colors.deepOrange,
-                                    width: 3,
-                                  ),
+                    final recetasFiltradas = _filtrarRecetas(snapshot.data!);
+
+                    if (recetasFiltradas.isEmpty) {
+                      return Center(
+                        child: Text(
+                          'No se encontraron recetas',
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                      );
+                    }
+
+                    return ListView.builder(
+                      itemCount: recetasFiltradas.length,
+                      itemBuilder: (context, index) {
+                        final receta = recetasFiltradas[index];
+                        final esSeleccionada =
+                            recetaSeleccionada?.id == receta.id;
+
+                        return Card(
+                          margin: EdgeInsets.symmetric(vertical: 8),
+                          color: esSeleccionada
+                              ? Colors.blue[50]
+                              : Colors.white,
+                          child: ListTile(
+                            selected: esSeleccionada,
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => RecetaDetailDialog(
+                                  receta: receta,
+                                  onEditar: (r) => _accionEditar(r),
+                                  onEliminar: (r) => _accionEliminar(r),
                                 ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: receta.imagenReferencial != null
-                                      ? Image.file(
-                                          File(receta.imagenReferencial!),
-                                          fit: BoxFit.cover,
-                                          errorBuilder: (context, error, stackTrace) {
-                                            return Icon(
-                                              Icons.broken_image,
-                                              color: Colors.grey,
-                                              size: 30,
-                                            );
-                                          },
-                                        )
-                                      : Icon(
-                                          Icons.palette,
-                                          color: Colors.deepOrange,
-                                          size: 30,
-                                        ),
+                              );
+                            },
+                            leading: Container(
+                              width: 80,
+                              height: 80,
+                              decoration: BoxDecoration(
+                                color: Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.deepOrange,
+                                  width: 3,
                                 ),
                               ),
-                              title: Text(
-                                receta.nombre,
-                                style: GoogleFonts.oswald(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    receta.descripcion,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    '${receta.materiaPrima.length} materias primas',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                ],
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(5),
+                                child: receta.imagenReferencial != null
+                                    ? (receta.imagenReferencial!.startsWith(
+                                            'http',
+                                          ))
+                                          ? Image.network(
+                                              receta.imagenReferencial!,
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (
+                                                    context,
+                                                    error,
+                                                    stackTrace,
+                                                  ) => Icon(
+                                                    Icons.broken_image,
+                                                    size: 30,
+                                                    color: Colors.grey,
+                                                  ),
+                                            )
+                                          : Image.file(
+                                              File(receta.imagenReferencial!),
+                                              fit: BoxFit.cover,
+                                              errorBuilder:
+                                                  (context, error, stackTrace) {
+                                                    return Icon(
+                                                      Icons.broken_image,
+                                                      color: Colors.grey,
+                                                      size: 30,
+                                                    );
+                                                  },
+                                            )
+                                    : Icon(
+                                        Icons.palette,
+                                        color: Colors.deepOrange,
+                                        size: 30,
+                                      ),
                               ),
                             ),
-                          );
-                        },
-                      ),
+                            title: Text(
+                              receta.nombre,
+                              style: GoogleFonts.oswald(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  receta.descripcion,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                Text(
+                                  '${receta.materiaPrima.length} materias primas',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey[600],
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
               ),
             ],
           ),

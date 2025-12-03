@@ -62,11 +62,10 @@ class _InventarioPageState extends State<InventarioPage> {
       builder: (dialogContext) => InventarioAddDialog(
         categorias: filterOptions,
         onGuardar: (item) async {
-          final messenger = ScaffoldMessenger.of(context);
           try {
             await _inventarioService.addInventarioItem(item);
             if (!mounted) return;
-            messenger.showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Item añadido correctamente'),
                 backgroundColor: Colors.green,
@@ -74,7 +73,7 @@ class _InventarioPageState extends State<InventarioPage> {
             );
           } catch (e) {
             if (!mounted) return;
-            messenger.showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Error al añadir el item: $e'),
                 backgroundColor: Colors.red,
@@ -103,12 +102,11 @@ class _InventarioPageState extends State<InventarioPage> {
         item: itemSeleccionado!,
         categorias: filterOptions,
         onGuardar: (item) async {
-          final messenger = ScaffoldMessenger.of(context);
           try {
             await _inventarioService.updateInventarioItem(item);
             if (!mounted) return;
             setState(() => itemSeleccionado = null);
-            messenger.showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Item editado correctamente'),
                 backgroundColor: Colors.green,
@@ -116,7 +114,7 @@ class _InventarioPageState extends State<InventarioPage> {
             );
           } catch (e) {
             if (!mounted) return;
-            messenger.showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Error al editar el item: $e'),
                 backgroundColor: Colors.red,
@@ -147,12 +145,11 @@ class _InventarioPageState extends State<InventarioPage> {
         detalles:
             'Código: ${itemSeleccionado!.codigo}\nNombre: ${itemSeleccionado!.nombre}',
         onConfirmar: () async {
-          final messenger = ScaffoldMessenger.of(context);
           try {
             await _inventarioService.deleteInventarioItem(itemSeleccionado!.id);
             if (!mounted) return;
             setState(() => itemSeleccionado = null);
-            messenger.showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Item eliminado correctamente'),
                 backgroundColor: Colors.red,
@@ -160,7 +157,7 @@ class _InventarioPageState extends State<InventarioPage> {
             );
           } catch (e) {
             if (!mounted) return;
-            messenger.showSnackBar(
+            ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
                 content: Text('Error al eliminar el item: $e'),
                 backgroundColor: Colors.red,
