@@ -236,13 +236,51 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                 },
               ),
               SizedBox(height: 12),
-              TextFormField(
-                controller: unidadController,
-                decoration: InputDecoration(
-                  labelText: 'Unidad',
-                  border: OutlineInputBorder(),
+              // Campo de unidad solo para Materia Prima y Esmalte
+              if (tipoSeleccionado == 'Materia Prima' ||
+                  tipoSeleccionado == 'Esmalte')
+                TextFormField(
+                  controller: unidadController,
+                  decoration: InputDecoration(
+                    labelText: 'Unidad (kg, L, g, ml) *',
+                    hintText: 'Ej: kg, L, g',
+                    border: OutlineInputBorder(),
+                  ),
+                  validator: (value) => (value?.isEmpty ?? true)
+                      ? 'Requerido para materias primas y esmaltes'
+                      : null,
+                )
+              else
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Container(
+                    padding: EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue[50],
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.blue[200]!),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.info_outline,
+                          size: 20,
+                          color: Colors.blue[700],
+                        ),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Se contabiliza por unidades',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.blue[900],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
             ],
           ),
         ),
@@ -263,7 +301,11 @@ class _InventarioEditDialogState extends State<InventarioEditDialog> {
                 tipo: tipoSeleccionado,
                 stockInicial: stockInicial,
                 stockActual: stockActual,
-                unidad: unidadController.text,
+                unidad:
+                    (tipoSeleccionado == 'Materia Prima' ||
+                        tipoSeleccionado == 'Esmalte')
+                    ? unidadController.text
+                    : null,
                 estadoProducto: tipoSeleccionado == 'Producto'
                     ? estadoProductoSeleccionado
                     : null,

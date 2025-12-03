@@ -11,7 +11,7 @@ class InventarioItem {
   final String tipo; // Producto, Materia Prima, Esmalte, Molde
   final int stockInicial;
   final int stockActual;
-  final String unidad;
+  final String? unidad;
   final EstadoProducto? estadoProducto;
   final EstadoStock? estadoStock;
   final String? imagenReferencial;
@@ -23,7 +23,7 @@ class InventarioItem {
     required this.tipo,
     required this.stockInicial,
     required this.stockActual,
-    required this.unidad,
+    this.unidad,
     this.estadoProducto,
     this.estadoStock,
     this.imagenReferencial,
@@ -32,6 +32,13 @@ class InventarioItem {
          (tipo == 'Producto' && estadoProducto != null) ||
              (tipo != 'Producto' && estadoStock != null),
          'Estado incorrecto para el tipo de item',
+       ),
+       // ✅ Validación: Materia Prima y Esmalte DEBEN tener unidad
+       assert(
+         (tipo == 'Materia Prima' || tipo == 'Esmalte')
+             ? (unidad != null && unidad.isNotEmpty)
+             : true,
+         'Materia Prima y Esmalte requieren unidad',
        );
 
   // Determina estado automáticamente basado en stock
@@ -150,7 +157,7 @@ class InventarioItem {
       tipo: map['tipo'] ?? '',
       stockInicial: map['stockInicial']?.toInt() ?? 0,
       stockActual: map['stockActual']?.toInt() ?? 0,
-      unidad: map['unidad'] ?? '',
+      unidad: map['unidad'],
       estadoProducto: map['estadoProducto'] != null
           ? EstadoProducto.values.firstWhere(
               (e) => e.name == map['estadoProducto'],
