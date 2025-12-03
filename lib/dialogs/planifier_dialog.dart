@@ -109,7 +109,7 @@ class _PlanifierDialogState extends State<PlanifierDialog> {
               TextFormField(
                 controller: hornoController,
                 decoration: InputDecoration(
-                  labelText: 'Horno',
+                  labelText: 'Horno *',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {

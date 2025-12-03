@@ -23,9 +23,12 @@ class _HornadasPageState extends State<HornadasPage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
+  late Stream<List<Hornada>> _hornadasStream;
+
   @override
   void initState() {
     super.initState();
+    _hornadasStream = _hornadaService.getHornadas();
     _selectedDay = _normalizarFecha(DateTime.now());
   }
 
@@ -50,6 +53,7 @@ class _HornadasPageState extends State<HornadasPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: grisoscuro,
         leading: IconButton(
@@ -83,7 +87,7 @@ class _HornadasPageState extends State<HornadasPage> {
           ),
         ),
         child: StreamBuilder<List<Hornada>>(
-          stream: _hornadaService.getHornadas(),
+          stream: _hornadasStream,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
@@ -221,9 +225,16 @@ class _HornadasPageState extends State<HornadasPage> {
     );
   }
 
+  void _refreshHornadas() {
+    setState(() {
+      _hornadasStream = _hornadaService.getHornadas();
+    });
+  }
+
   Future<void> _agregarHornada(Hornada hornada) async {
     try {
       await _hornadaService.addHornada(hornada);
+      _refreshHornadas();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -246,6 +257,7 @@ class _HornadasPageState extends State<HornadasPage> {
   Future<void> _actualizarHornada(Hornada hornada) async {
     try {
       await _hornadaService.updateHornada(hornada);
+      _refreshHornadas();
       if (!mounted) return;
       String mensaje = hornada.estado == 'En Curso'
           ? 'Quema iniciada correctamente'
@@ -272,6 +284,7 @@ class _HornadasPageState extends State<HornadasPage> {
   Future<void> _eliminarHornada(Hornada hornada) async {
     try {
       await _hornadaService.deleteHornada(hornada.id);
+      _refreshHornadas();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
